@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Interfaces\IUser;
+use App\Model\UserResponseModel;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -45,8 +48,8 @@ class AuthController extends Controller
      */
     public function loginAction(Request $request)
     {
-        $username = $request->query->get("username");
-        $plainPassword = $request->query->get("password");
+        $username = $request->headers->get("username");
+        $plainPassword = $request->headers->get("password");
         $json = [ 'path' => 'src/Controller/UserController.php' ];
         $response = new Response();
         $response->headers->set("Content-Type", "application/json");
@@ -56,14 +59,13 @@ class AuthController extends Controller
 
         /** @var $result User */
         if ($result != null) {
-            $userPassword = password_hash($plainPassword, PASSWORD_BCRYPT);
             $dbPassword = $result->getPassword();
 
-            if ($userPassword == $dbPassword) {
-                // generate random session id
-                $sessionId = bin2hex(openssl_random_pseudo_bytes(10));
+            if (password_verify($plainPassword, $dbPassword)) {
+                $jwtManager = $this->container->get("lexik_jwt_authentication.jwt_manager");
+                $token = $jwtManager->create(new UserResponseModel($result));
 
-                array_push($json, [ 'response' => 'User logged in successfully.', 'sessionId' => $sessionId ]);
+                array_push($json, [ 'response' => 'User logged in successfully.', 'token' => $token ]);
                 $response->setStatusCode(Response::HTTP_OK);
             } else {
                 array_push($json, [ 'response' => 'User login failed. Wrong username or password.' ]);
@@ -96,19 +98,30 @@ class AuthController extends Controller
      *     required=true
      * )
      * @SWG\Parameter(
-     *     name="sessionId",
+     *     name="token",
      *     in="query",
      *     type="string",
-     *     description="The session id.",
+     *     description="The token from the user.",
      *     required=true
      * )
      * @SWG\Tag(name="auth")
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function logoutAction()
+    public function logoutAction(Request $request)
     {
+        $username = $request->headers->get("username");
+        $token = $request->headers->get("token");
+
+        /** @var $result User */
+        $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $username]);
+        $user = new UserResponseModel($result);
+        $authenticationSuccessHandler = $this->container->get('lexik_jwt_authentication.handler.authentication_success');
+
         return $this->json([
-            'message' => 'Welcome to your new controller!',
             'path' => 'src/Controller/UserController.php',
+            'response' => $authenticationSuccessHandler->handleAuthenticationSuccess($user, $token),
         ]);
     }
 

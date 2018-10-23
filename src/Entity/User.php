@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Interfaces\IUser;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User
+class User implements IUser
 {
     /**
      * @ORM\Id()
@@ -40,21 +41,6 @@ class User
      * @ORM\Column(type="integer")
      */
     private $gId;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $sId;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $pId;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $uaId;
 
     public function getId(): ?int
     {
@@ -121,39 +107,45 @@ class User
         return $this;
     }
 
-    public function getSId(): ?int
+    /**
+     * Returns the roles granted to the user.
+     *
+     *     public function getRoles()
+     *     {
+     *         return array('ROLE_USER');
+     *     }
+     *
+     * Alternatively, the roles might be stored on a ``roles`` property,
+     * and populated in any number of different ways when the user object
+     * is created.
+     *
+     * @return (Role|string)[] The user roles
+     */
+    public function getRoles()
     {
-        return $this->sId;
+        return array('ROLE_USER');
     }
 
-    public function setSId(int $sId): self
+    /**
+     * Returns the salt that was originally used to encode the password.
+     *
+     * This can return null if the password was not encoded using a salt.
+     *
+     * @return string|null The salt
+     */
+    public function getSalt()
     {
-        $this->sId = $sId;
-
-        return $this;
+        return null;
     }
 
-    public function getPId(): ?int
+    /**
+     * Removes sensitive data from the user.
+     *
+     * This is important if, at any given point, sensitive information like
+     * the plain-text password is stored on this object.
+     */
+    public function eraseCredentials()
     {
-        return $this->pId;
-    }
-
-    public function setPId(int $pId): self
-    {
-        $this->pId = $pId;
-
-        return $this;
-    }
-
-    public function getUaId(): ?int
-    {
-        return $this->uaId;
-    }
-
-    public function setUaId(int $uaId): self
-    {
-        $this->uaId = $uaId;
-
-        return $this;
+        return null;
     }
 }

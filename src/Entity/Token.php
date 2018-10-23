@@ -5,9 +5,9 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\SessionRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\TokenRepository")
  */
-class Session
+class Token
 {
     /**
      * @ORM\Id()
@@ -19,7 +19,12 @@ class Session
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $sessionId;
+    private $token;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $uId;
 
     /**
      * @ORM\Column(type="datetime")
@@ -31,14 +36,14 @@ class Session
         return $this->id;
     }
 
-    public function getSessionId(): ?string
+    public function getToken(): ?string
     {
-        return $this->sessionId;
+        return $this->token;
     }
 
-    public function setSessionId(string $sessionId): self
+    public function setToken(string $token): self
     {
-        $this->sessionId = $sessionId;
+        $this->token = $token;
 
         return $this;
     }
@@ -51,6 +56,18 @@ class Session
     public function setExpireDate(\DateTimeInterface $expireDate): self
     {
         $this->expireDate = $expireDate;
+
+        return $this;
+    }
+
+    public function getUId(): ?int
+    {
+        return $this->uId;
+    }
+
+    public function setUId(int $uId): self
+    {
+        $this->uId = $uId;
 
         return $this;
     }
