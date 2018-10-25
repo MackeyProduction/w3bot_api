@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Interfaces\IUser;
 use App\Model\UserResponseModel;
+use Lexik\Bundle\JWTAuthenticationBundle\Response\JWTAuthenticationSuccessResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -22,6 +23,7 @@ class AuthController extends Controller
      * @SWG\Response(
      *     response=200,
      *     description="The user logged in successfully.",
+     *     @Model(type=UserResponseModel::class, groups={"non_sensitive_data"})
      * )
      * @SWG\Response(
      *     response=403,
@@ -44,13 +46,14 @@ class AuthController extends Controller
      * @SWG\Tag(name="auth")
      *
      * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param JWTTokenManagerInterface $JWTTokenManager
+     * @return Response
      */
-    public function loginAction(Request $request)
+    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager)
     {
         $username = $request->headers->get("username");
         $plainPassword = $request->headers->get("password");
-        $json = [ 'path' => 'src/Controller/UserController.php' ];
+        $json = [];
         $response = new Response();
         $response->headers->set("Content-Type", "application/json");
 
@@ -62,8 +65,7 @@ class AuthController extends Controller
             $dbPassword = $result->getPassword();
 
             if (password_verify($plainPassword, $dbPassword)) {
-                $jwtManager = $this->container->get("lexik_jwt_authentication.jwt_manager");
-                $token = $jwtManager->create(new UserResponseModel($result));
+                $token = $JWTTokenManager->create(new UserResponseModel($result));
 
                 array_push($json, [ 'response' => 'User logged in successfully.', 'token' => $token ]);
                 $response->setStatusCode(Response::HTTP_OK);

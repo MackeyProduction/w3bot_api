@@ -3,6 +3,9 @@ namespace App\Model;
 
 use App\Entity\User;
 use App\Interfaces\IUser;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 /**
  * Created by PhpStorm.
@@ -11,19 +14,49 @@ use App\Interfaces\IUser;
  * Time: 21:31
  */
 
-class UserResponseModel implements \Symfony\Component\Security\Core\User\UserInterface
+class UserResponseModel implements UserInterface
 {
     private $user;
 
     public function __construct(IUser $user)
     {
         $this->user = $user;
+
+        $this->id = $user->getId();
+        $this->username = $user->getUsername();
+        $this->registerDate = $user->getRegisterDate();
+        $this->roles = $this->getRoles();
     }
 
-    public function getId(): ?int
-    {
-        return $this->user->getId();
-    }
+    /**
+     * @var int
+     * @SWG\Property(description="The unique identifier of the user.")
+     */
+    public $id;
+
+    /**
+     * @var string
+     * @SWG\Property(description="The username from the user.", type="string", maxLength=255)
+     */
+    public $username;
+
+    /**
+     * @var string
+     * @SWG\Property(description="The email address from the user.", type="string", maxLength=255)
+     */
+    public $email;
+
+    /**
+     * @var string
+     * @SWG\Property(description="The register date from the user.", type="string", maxLength=255)
+     */
+    public $registerDate;
+
+    /**
+     * @var array
+     * @SWG\Property(description="The roles from the user.", type="string", maxLength=255)
+     */
+    public $roles;
 
     public function getUsername(): ?string
     {
@@ -33,16 +66,6 @@ class UserResponseModel implements \Symfony\Component\Security\Core\User\UserInt
     public function getPassword(): ?string
     {
         return $this->user->getPassword();
-    }
-
-    public function getEmail(): ?string
-    {
-        return $this->user->getEmail();
-    }
-
-    public function getRegisterDate(): ?\DateTimeInterface
-    {
-        return $this->user->getRegisterDate();
     }
 
     /**
@@ -56,6 +79,8 @@ class UserResponseModel implements \Symfony\Component\Security\Core\User\UserInt
      * Alternatively, the roles might be stored on a ``roles`` property,
      * and populated in any number of different ways when the user object
      * is created.
+     *
+     * @SWG\Property(description="The register date from the user.", type="string", maxLength=255)
      *
      * @return (Role|string)[] The user roles
      */
