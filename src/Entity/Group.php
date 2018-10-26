@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Interfaces\IGroup;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\GroupRepository")
  */
-class Group
+class Group implements IGroup
 {
     /**
      * @ORM\Id()

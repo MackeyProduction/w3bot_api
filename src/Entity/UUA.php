@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Interfaces\IUser;
+use App\Interfaces\IUserAgent;
 use App\Interfaces\IUUserAgent;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -26,6 +28,18 @@ class UUA implements IUUserAgent
      * @ORM\Column(type="integer")
      */
     private $uaId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="UserAgent")
+     * @ORM\JoinColumn(name="ua_id", referencedColumnName="id")
+     */
+    private $userAgent;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="u_id", referencedColumnName="id")
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -54,5 +68,21 @@ class UUA implements IUUserAgent
         $this->uaId = $uaId;
 
         return $this;
+    }
+
+    /**
+     * @return IUserAgent
+     */
+    public function getUserAgent()
+    {
+        return $this->userAgent;
+    }
+
+    /**
+     * @return IUser
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Interfaces\IUser;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -41,6 +42,11 @@ class User implements IUser
      * @ORM\Column(type="integer")
      */
     private $gId;
+
+    /**
+     * @var (Role|string)[]
+     */
+    private $roles;
 
     public function getId(): ?int
     {
@@ -83,12 +89,12 @@ class User implements IUser
         return $this;
     }
 
-    public function getRegisterDate(): ?\DateTimeInterface
+    public function getRegisterDate(): ?string
     {
         return $this->registerDate;
     }
 
-    public function setRegisterDate(\DateTimeInterface $registerDate): self
+    public function setRegisterDate(string $registerDate): self
     {
         $this->registerDate = $registerDate;
 
@@ -123,7 +129,9 @@ class User implements IUser
      */
     public function getRoles()
     {
-        return array('ROLE_USER');
+        $this->roles = ['ROLE_USER'];
+
+        return $this->roles;
     }
 
     /**

@@ -2,18 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: Til Anheier
- * Date: 23.10.2018
- * Time: 21:42
+ * Date: 26.10.2018
+ * Time: 22:32
  */
+
 namespace App\Interfaces;
 
-use \Symfony\Component\Security\Core\User\UserInterface;
-
 /**
- * Interface IUser
+ * Interface ISoftware
  * @package App\Interfaces
  */
-interface IUser
+interface ISoftware
 {
     /**
      * @return int|null
@@ -23,20 +22,20 @@ interface IUser
     /**
      * @return null|string
      */
-    public function getUsername(): ?string;
+    public function getName(): ?string;
 
     /**
      * @return null|string
      */
-    public function getPassword(): ?string;
+    public function getVersion(): ?string;
 
     /**
      * @return null|string
      */
-    public function getEmail(): ?string;
+    public function getLeName(): ?string;
 
     /**
      * @return null|string
      */
-    public function getRegisterDate(): ?string;
+    public function getLeVersion(): ?string;
 }

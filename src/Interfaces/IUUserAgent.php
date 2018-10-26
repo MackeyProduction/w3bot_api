@@ -8,9 +8,19 @@
 
 namespace App\Interfaces;
 
-
+/**
+ * Interface IUUserAgent
+ * @package App\Interfaces
+ */
 interface IUUserAgent
 {
-    public function getUId();
-    public function getUAId();
+    /**
+     * @return IUser
+     */
+    public function getUser();
+
+    /**
+     * @return IUserAgent
+     */
+    public function getUserAgent();
 }

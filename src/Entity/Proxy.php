@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Interfaces\IProxy;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ProxyRepository")
  */
-class Proxy
+class Proxy implements IProxy
 {
     /**
      * @ORM\Id()

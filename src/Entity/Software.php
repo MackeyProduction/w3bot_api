@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Interfaces\ISoftware;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SoftwareRepository")
  */
-class Software
+class Software implements ISoftware
 {
     /**
      * @ORM\Id()

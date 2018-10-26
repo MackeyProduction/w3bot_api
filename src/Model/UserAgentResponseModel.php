@@ -9,6 +9,8 @@
 namespace App\Model;
 
 use App\Entity\UUA;
+use App\Interfaces\IUser;
+use App\Interfaces\IUserAgent;
 use App\Interfaces\IUUserAgent;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
@@ -31,12 +33,12 @@ class UserAgentResponseModel
     }
 
     /**
-     * @SWG\Property(ref=@Model(type=UUA::class))
+     * @var IUserAgent
      */
     public $agent;
 
     /**
-     * @SWG\Property(ref=@Model(type=User::class))
+     * @var IUser
      */
     public $user;
 }

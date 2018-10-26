@@ -22,8 +22,7 @@ class AuthController extends Controller
      * @Route("/api/login", methods={"POST"}, name="login")
      * @SWG\Response(
      *     response=200,
-     *     description="The user logged in successfully.",
-     *     @Model(type=UserResponseModel::class, groups={"non_sensitive_data"})
+     *     description="The user logged in successfully."
      * )
      * @SWG\Response(
      *     response=403,

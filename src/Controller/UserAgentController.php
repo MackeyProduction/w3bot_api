@@ -46,6 +46,7 @@ class UserAgentController extends Controller
      * @SWG\Response(
      *     response=200,
      *     description="Returns the user agent by id.",
+     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
      * )
      * @SWG\Parameter(
      *     name="token",
@@ -62,6 +63,9 @@ class UserAgentController extends Controller
      *     required=true
      * )
      * @SWG\Tag(name="agent")
+     *
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function fetchUserAgentById($id)
     {

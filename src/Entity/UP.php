@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\Interfaces\IProxy;
+use App\Interfaces\IUProxy;
+use App\Interfaces\IUser;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UPRepository")
  */
-class UP
+class UP implements IUProxy
 {
     /**
      * @ORM\Id()
@@ -25,6 +28,18 @@ class UP
      * @ORM\Column(type="integer")
      */
     private $pId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Proxy")
+     * @ORM\JoinColumn(name="p_id", referencedColumnName="id")
+     */
+    private $proxy;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="u_id", referencedColumnName="id")
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -53,5 +68,21 @@ class UP
         $this->pId = $pId;
 
         return $this;
+    }
+
+    /**
+     * @return IProxy
+     */
+    public function getProxy()
+    {
+        return $this->proxy;
+    }
+
+    /**
+     * @return IUser
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 }

@@ -2,8 +2,11 @@
 
 namespace App\Controller;
 
+use App\Model\ProxyResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 class ProxyController extends AbstractController
 {
@@ -14,7 +17,7 @@ class ProxyController extends AbstractController
      * @SWG\Response(
      *     response=200,
      *     description="Returns a list of proxies filtered by user.",
-     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
+     *     @Model(type=ProxyResponseModel::class, groups={"full"})
      * )
      * @SWG\Parameter(
      *     name="token",
@@ -37,7 +40,7 @@ class ProxyController extends AbstractController
      * @SWG\Response(
      *     response=200,
      *     description="Returns the proxy.",
-     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
+     *     @Model(type=ProxyResponseModel::class, groups={"full"})
      * )
      * @SWG\Parameter(
      *     name="token",
