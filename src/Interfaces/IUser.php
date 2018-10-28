@@ -33,10 +33,15 @@ interface IUser
     /**
      * @return null|string
      */
-    public function getEmail(): ?string;
+    public function getPlainPassword(): ?string;
 
     /**
      * @return null|string
      */
-    public function getRegisterDate(): ?string;
+    public function getEmail(): ?string;
+
+    /**
+     * @return null|\DateTime
+     */
+    public function getRegisterDate(): ?\DateTime;
 }

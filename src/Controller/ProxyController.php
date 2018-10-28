@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\UP;
+use App\Factory\ProxyFactory;
+use App\Interfaces\ICollectionService;
 use App\Model\ProxyResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,19 +30,25 @@ class ProxyController extends AbstractController
      *     required=true
      * )
      * @SWG\Tag(name="proxy")
+     *
+     * @param ICollectionService $collectionService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxies()
+    public function fetchProxies(ICollectionService $collectionService)
     {
-        return $this->json("");
+        $data = $this->getDoctrine()->getRepository(UP::class)->findAll();
+        $result = $collectionService->getCollection(ProxyFactory::class, $data);
+
+        return $this->json($result);
     }
 
     /**
-     * Gets a proxy by id.
+     * Inserts a new proxy into the database.
      *
-     * @Route("/api/proxy/{id}", methods={"GET"})
+     * @Route("/api/proxy", methods={"POST"})
      * @SWG\Response(
      *     response=200,
-     *     description="Returns the proxy.",
+     *     description="Returns true when insert was successful.",
      *     @Model(type=ProxyResponseModel::class, groups={"full"})
      * )
      * @SWG\Parameter(
@@ -49,19 +58,11 @@ class ProxyController extends AbstractController
      *     description="The token from the user.",
      *     required=true
      * )
-     * @SWG\Parameter(
-     *     name="id",
-     *     in="path",
-     *     type="string",
-     *     description="The id from the proxy.",
-     *     required=true
-     * )
      * @SWG\Tag(name="proxy")
      *
-     * @param $id
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxyById($id)
+    public function postProxy()
     {
         return $this->json("");
     }

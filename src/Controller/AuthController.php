@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Interfaces\IUser;
+use App\Interfaces\IUserService;
 use App\Model\UserResponseModel;
 use Lexik\Bundle\JWTAuthenticationBundle\Response\JWTAuthenticationSuccessResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -46,41 +48,35 @@ class AuthController extends Controller
      *
      * @param Request $request
      * @param JWTTokenManagerInterface $JWTTokenManager
-     * @return Response
+     * @param IUserService $userService
+     * @return JsonResponse
      */
-    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager)
+    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService)
     {
+        // fetch credentials
         $username = $request->headers->get("username");
         $plainPassword = $request->headers->get("password");
         $json = [];
-        $response = new Response();
-        $response->headers->set("Content-Type", "application/json");
 
         // fetch username
         $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $username]);
+        $result->setPlainPassword($plainPassword);
 
-        /** @var $result User */
-        if ($result != null) {
-            $dbPassword = $result->getPassword();
+        /** @var IUser $result */
+        $response = $userService->verify($result);
 
-            if (password_verify($plainPassword, $dbPassword)) {
-                $token = $JWTTokenManager->create(new UserResponseModel($result));
+        if ($response->isOk()) {
+            $mappedUser = $userService->mapUserCredentials($result);
 
-                array_push($json, [ 'response' => 'User logged in successfully.', 'token' => $token ]);
-                $response->setStatusCode(Response::HTTP_OK);
-            } else {
-                array_push($json, [ 'response' => 'User login failed. Wrong username or password.' ]);
-                $response->setStatusCode(Response::HTTP_FORBIDDEN);
-            }
+            // generate token
+            $token = $JWTTokenManager->create($mappedUser);
+
+            array_push($json, [ $response->getContent(), 'token' => $token ]);
         } else {
-            array_push($json, [ 'response' => 'User login failed.' ]);
-            $response->setStatusCode(Response::HTTP_FORBIDDEN);
+            array_push($json, [ $response->getContent() ]);
         }
 
-        // set content of response
-        $response->setContent(json_encode($json));
-
-        return $response->prepare($request);
+        return $this->json($json);
     }
 
     /**

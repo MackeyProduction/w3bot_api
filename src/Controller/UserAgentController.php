@@ -8,6 +8,9 @@
 
 namespace App\Controller;
 
+use App\Entity\UUA;
+use App\Factory\UserAgentFactory;
+use App\Interfaces\ICollectionService;
 use App\Model\UserAgentResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -33,19 +36,25 @@ class UserAgentController extends Controller
      *     required=true
      * )
      * @SWG\Tag(name="agent")
+     *
+     * @param ICollectionService $collectionService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents()
+    public function fetchUserAgents(ICollectionService $collectionService)
     {
-        return $this->json("");
+        $data = $this->getDoctrine()->getRepository(UUA::class)->findAll();
+        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+
+        return $this->json($result);
     }
 
     /**
-     * Gets the user agent by id.
+     * Inserts a new user agent to the database.
      *
-     * @Route("/api/agent/{id}", methods={"GET"})
+     * @Route("/api/agent", methods={"POST"})
      * @SWG\Response(
      *     response=200,
-     *     description="Returns the user agent by id.",
+     *     description="Returns true when insert was successful.",
      *     @Model(type=UserAgentResponseModel::class, groups={"full"})
      * )
      * @SWG\Parameter(
@@ -55,19 +64,11 @@ class UserAgentController extends Controller
      *     description="The token from the user.",
      *     required=true
      * )
-     * @SWG\Parameter(
-     *     name="id",
-     *     in="path",
-     *     type="string",
-     *     description="The user from the user agent.",
-     *     required=true
-     * )
      * @SWG\Tag(name="agent")
      *
-     * @param $id
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentById($id)
+    public function postUserAgent()
     {
         return $this->json("");
     }

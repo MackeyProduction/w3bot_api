@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
+use App\Factory\UserFactory;
+use App\Interfaces\ICollectionService;
 use App\Model\UserResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,11 +28,14 @@ class UserController extends Controller
      *     required=true
      * )
      * @SWG\Tag(name="user")
+     * @param ICollectionService $collectionService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUser()
+    public function fetchUser(ICollectionService $collectionService)
     {
-        return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
-        ]);
+        $data = $this->getDoctrine()->getRepository(User::class)->findAll();
+        $result = $collectionService->getCollection(UserFactory::class, $data);
+
+        return $this->json($result);
     }
 }

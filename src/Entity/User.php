@@ -29,6 +29,11 @@ class User implements IUser
     private $password;
 
     /**
+     * @var string
+     */
+    private $plainPassword;
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $email;
@@ -70,13 +75,6 @@ class User implements IUser
         return $this->password;
     }
 
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-
-        return $this;
-    }
-
     public function getEmail(): ?string
     {
         return $this->email;
@@ -89,12 +87,12 @@ class User implements IUser
         return $this;
     }
 
-    public function getRegisterDate(): ?string
+    public function getRegisterDate(): ?\DateTime
     {
         return $this->registerDate;
     }
 
-    public function setRegisterDate(string $registerDate): self
+    public function setRegisterDate(\DateTime $registerDate): self
     {
         $this->registerDate = $registerDate;
 
@@ -155,5 +153,24 @@ class User implements IUser
     public function eraseCredentials()
     {
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword;
+    }
+
+    /**
+     * @param string $plainPassword
+     * @return $this
+     */
+    public function setPlainPassword(string $plainPassword)
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
     }
 }
