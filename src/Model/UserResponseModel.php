@@ -30,6 +30,7 @@ class UserResponseModel
 
         $this->id = $user->getId();
         $this->username = $user->getUsername();
+        $this->email = $user->getEmail();
         $this->registerDate = $user->getRegisterDate();
     }
 

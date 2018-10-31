@@ -14,6 +14,7 @@ use App\Interfaces\ICollectionService;
 use App\Model\UserAgentResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -28,14 +29,8 @@ class UserAgentController extends Controller
      *     description="Returns a list of user agent from the user.",
      *     @Model(type=UserAgentResponseModel::class, groups={"full"})
      * )
-     * @SWG\Parameter(
-     *     name="token",
-     *     in="query",
-     *     type="string",
-     *     description="The token from the user.",
-     *     required=true
-     * )
      * @SWG\Tag(name="agent")
+     * @Security(name="Bearer")
      *
      * @param ICollectionService $collectionService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -57,14 +52,8 @@ class UserAgentController extends Controller
      *     description="Returns true when insert was successful.",
      *     @Model(type=UserAgentResponseModel::class, groups={"full"})
      * )
-     * @SWG\Parameter(
-     *     name="token",
-     *     in="query",
-     *     type="string",
-     *     description="The token from the user.",
-     *     required=true
-     * )
      * @SWG\Tag(name="agent")
+     * @Security(name="Bearer")
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */

@@ -9,6 +9,7 @@ use App\Model\ProxyResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
 
 class ProxyController extends AbstractController
@@ -22,14 +23,8 @@ class ProxyController extends AbstractController
      *     description="Returns a list of proxies filtered by user.",
      *     @Model(type=ProxyResponseModel::class, groups={"full"})
      * )
-     * @SWG\Parameter(
-     *     name="token",
-     *     in="query",
-     *     type="string",
-     *     description="The token from the user.",
-     *     required=true
-     * )
      * @SWG\Tag(name="proxy")
+     * @Security(name="Bearer")
      *
      * @param ICollectionService $collectionService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -51,14 +46,8 @@ class ProxyController extends AbstractController
      *     description="Returns true when insert was successful.",
      *     @Model(type=ProxyResponseModel::class, groups={"full"})
      * )
-     * @SWG\Parameter(
-     *     name="token",
-     *     in="query",
-     *     type="string",
-     *     description="The token from the user.",
-     *     required=true
-     * )
      * @SWG\Tag(name="proxy")
+     * @Security(name="Bearer")
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
