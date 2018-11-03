@@ -19,9 +19,10 @@ class UserLoginFailedResponse extends AbstractResponse
 {
     /**
      * @param string $responseType
+     * @param array $data
      * @return JsonResponse
      */
-    public function fetch(string $responseType)
+    public function fetch(string $responseType, array $data = [])
     {
         return $this->jsonResponse::create(['response' => 'User login failed. Check your user credentials.'], $this->jsonResponse::HTTP_FORBIDDEN);
     }

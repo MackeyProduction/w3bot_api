@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\UP;
 use App\Factory\ProxyFactory;
 use App\Interfaces\ICollectionService;
+use App\Interfaces\ITokenService;
 use App\Model\ProxyResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -26,12 +28,14 @@ class ProxyController extends AbstractController
      * @SWG\Tag(name="proxy")
      * @Security(name="Bearer")
      *
+     * @param Request $request
      * @param ICollectionService $collectionService
+     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxies(ICollectionService $collectionService)
+    public function fetchProxies(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
     {
-        $data = $this->getDoctrine()->getRepository(UP::class)->findAll();
+        $data = $this->getDoctrine()->getRepository(UP::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
         $result = $collectionService->getCollection(ProxyFactory::class, $data);
 
         return $this->json($result);

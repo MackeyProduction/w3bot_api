@@ -36,6 +36,6 @@ class UserController extends Controller
         $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
         $result = $collectionService->getCollection(UserFactory::class, $data);
 
-        return $this->json($result);
+        return $tokenService->getTokenResponse($request, [ 'data' => $result ]);
     }
 }

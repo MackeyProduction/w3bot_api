@@ -19,10 +19,11 @@ class UserLoginSuccessResponse extends AbstractResponse
 {
     /**
      * @param string $responseType
+     * @param array $data
      * @return JsonResponse
      */
-    public function fetch(string $responseType)
+    public function fetch(string $responseType, array $data = [])
     {
-        return $this->jsonResponse::create(['response' => 'User logged in successfully.'], $this->jsonResponse::HTTP_OK);
+        return $this->jsonResponse::create(['response' => 'User logged in successfully.'] + $data, $this->jsonResponse::HTTP_OK);
     }
 }

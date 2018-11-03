@@ -11,11 +11,13 @@ namespace App\Controller;
 use App\Entity\UUA;
 use App\Factory\UserAgentFactory;
 use App\Interfaces\ICollectionService;
+use App\Interfaces\ITokenService;
 use App\Model\UserAgentResponseModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use Swagger\Annotations as SWG;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserAgentController extends Controller
@@ -32,12 +34,14 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      * @Security(name="Bearer")
      *
+     * @param Request $request
      * @param ICollectionService $collectionService
+     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents(ICollectionService $collectionService)
+    public function fetchUserAgents(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
     {
-        $data = $this->getDoctrine()->getRepository(UUA::class)->findAll();
+        $data = $this->getDoctrine()->getRepository(UUA::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
         return $this->json($result);

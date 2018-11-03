@@ -33,5 +33,5 @@ abstract class AbstractResponse
         return new static($jsonResponse);
     }
 
-    abstract public function fetch(string $jsonResponse);
+    abstract public function fetch(string $jsonResponse, array $data = []);
 }

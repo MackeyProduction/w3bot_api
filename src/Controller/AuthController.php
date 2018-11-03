@@ -3,10 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
 use App\Interfaces\IUser;
 use App\Interfaces\IUserService;
 use App\Model\UserResponseModel;
+use App\Response\UserLoginFailedResponse;
+use App\Response\UserLoginSuccessResponse;
 use App\Service\TokenService;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\HeaderAwareJWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
@@ -55,34 +58,35 @@ class AuthController extends Controller
      * @param Request $request
      * @param JWTTokenManagerInterface $JWTTokenManager
      * @param IUserService $userService
+     * @param IResponseService $response
      * @return JsonResponse
      */
-    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService)
+    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService, IResponseService $response)
     {
         // fetch credentials
         $username = $request->headers->get("username");
         $plainPassword = $request->headers->get("password");
-        $json = [];
 
         // fetch username
         $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $username]);
-        $result->setPlainPassword($plainPassword);
 
-        /** @var IUser $result */
-        $response = $userService->verify($result);
+        if ($result != null) {
+            $result->setPlainPassword($plainPassword);
 
-        if ($response->isOk()) {
-            $mappedUser = $userService->mapUserCredentials($result);
+            /** @var IUser $result */
+            $isOk = $userService->verify($result);
 
-            // generate token
-            $token = $JWTTokenManager->create($mappedUser);
+            if ($isOk) {
+                $mappedUser = $userService->mapUserCredentials($result);
 
-            array_push($json, [ $response->getContent(), 'token' => $token ]);
-        } else {
-            array_push($json, [ $response->getContent() ]);
+                // generate token
+                $token = $JWTTokenManager->create($mappedUser);
+
+                return $response->getJsonResponse(UserLoginSuccessResponse::class, ['token' => $token]);
+            }
         }
 
-        return $this->json($json);
+        return $response->getJsonResponse(UserLoginFailedResponse::class);
     }
 
     /**
@@ -102,7 +106,7 @@ class AuthController extends Controller
      */
     public function logoutAction(Request $request, ITokenService $tokenService)
     {
-        return $tokenService->getTokenResponse($request);
+        return $tokenService->getTokenResponse($request, ['response' => 'User logged out successfully.']);
     }
 
     /**

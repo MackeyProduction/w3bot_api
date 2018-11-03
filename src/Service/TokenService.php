@@ -64,7 +64,6 @@ class TokenService extends BaseAuthenticator implements ITokenService
         return JsonResponse::create([
             'token' => $this->getCredentials($request),
             'payload' => $this->getPayload($request),
-            'data' => $data,
-        ], JsonResponse::HTTP_OK);
+        ] + $data, JsonResponse::HTTP_OK);
     }
 }

@@ -42,7 +42,7 @@ class UserService implements IUserService
 
     /**
      * @param IUser $user
-     * @return JsonResponse
+     * @return boolean
      */
     public function verify(IUser $user)
     {
@@ -52,13 +52,13 @@ class UserService implements IUserService
 
             // is password valid?
             if (password_verify($user->getPlainPassword(), $dbPassword)) {
-                return $this->response->getJsonResponse(UserLoginSuccessResponse::class);
+                return true;
             } else {
-                return $this->response->getJsonResponse(UserLoginFailedResponse::class);
+                return false;
             }
         }
 
-        return $this->response->getJsonResponse(UserLoginFailedResponse::class);
+        return false;
     }
 
     /**

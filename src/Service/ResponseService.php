@@ -30,15 +30,16 @@ class ResponseService implements IResponseService
 
     /**
      * @param string $responseType
+     * @param array $data
      * @return AbstractResponse
      */
-    public function getJsonResponse(string $responseType)
+    public function getJsonResponse(string $responseType, array $data = [])
     {
         if (class_exists($responseType)) {
             /** @var AbstractResponse $responseType */
             $result = $responseType::create($this->jsonResponse);
 
-            return $result->fetch($responseType);
+            return $result->fetch($responseType, $data);
         }
 
         return null;

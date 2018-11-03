@@ -52,9 +52,7 @@ class SimpleCollection
     {
         return [
             'count' => $this->adapter->count(),
-            'items' => array(
-                $this->adapter->getArray()
-            )
+            'items' => $this->adapter->getArray()
         ];
     }
 

@@ -18,7 +18,8 @@ interface IResponseService
 {
     /**
      * @param string $responseType
+     * @param array $data
      * @return JsonResponse
      */
-    public function getJsonResponse(string $responseType);
+    public function getJsonResponse(string $responseType, array $data = []);
 }
