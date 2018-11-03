@@ -2,19 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: Til Anheier
- * Date: 28.10.2018
- * Time: 14:54
+ * Date: 03.11.2018
+ * Time: 15:18
  */
 
 namespace App\Factory;
 
-use App\Interfaces\IUUserAgent;
 use App\Model\UserAgentResponseModel;
 
+/**
+ * Class UserAgentFactory
+ * @package App\Factory
+ */
 class UserAgentFactory extends AbstractResponseModel
 {
     /**
-     * @param IUUserAgent $entity
+     * @param $entity
      * @return UserAgentResponseModel
      */
     protected function fetch($entity)

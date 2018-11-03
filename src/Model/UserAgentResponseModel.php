@@ -2,16 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: Til Anheier
- * Date: 25.10.2018
- * Time: 22:23
+ * Date: 03.11.2018
+ * Time: 15:19
  */
 
 namespace App\Model;
 
-use App\Entity\UUA;
-use App\Interfaces\IUser;
+use App\Interfaces\IOperatingSystem;
+use App\Interfaces\ISoftware;
 use App\Interfaces\IUserAgent;
-use App\Interfaces\IUUserAgent;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 
@@ -21,24 +20,32 @@ use Swagger\Annotations as SWG;
  */
 class UserAgentResponseModel
 {
-    private $userAgent;
-
     /**
      * UserAgentResponseModel constructor.
-     * @param IUUserAgent $userAgent
+     * @param IUserAgent $userAgent
      */
-    public function __construct(IUUserAgent $userAgent)
+    public function __construct(IUserAgent $userAgent)
     {
-        $this->userAgent = $userAgent;
+        $this->id = $userAgent->getId();
+        $this->operatingSystem = $userAgent->getOperatingSystem();
+        $this->software = $userAgent->getSoftware();
     }
 
     /**
-     * @var IUserAgent
+     * @var int
+     * @SWG\Property(description="The unique identifier of the user agent.")
      */
-    public $agent;
+    public $id;
 
     /**
-     * @var IUser
+     * @var IOperatingSystem
+     * @SWG\Property(description="The operating system of the user agent.")
      */
-    public $user;
+    public $operatingSystem;
+
+    /**
+     * @var ISoftware
+     * @SWG\Property(description="The software of the user agent.")
+     */
+    public $software;
 }

@@ -23,11 +23,6 @@ class UserAgent implements IUserAgent
     /**
      * @ORM\Column(type="integer")
      */
-    private $uId;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $osId;
 
     /**
@@ -47,27 +42,9 @@ class UserAgent implements IUserAgent
      */
     private $software;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(name="u_id", referencedColumnName="id")
-     */
-    private $user;
-
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getUId(): ?int
-    {
-        return $this->uId;
-    }
-
-    public function setUId(int $uId): self
-    {
-        $this->uId = $uId;
-
-        return $this;
     }
 
     public function getOsId(): ?int
@@ -92,14 +69,6 @@ class UserAgent implements IUserAgent
         $this->sId = $sId;
 
         return $this;
-    }
-
-    /**
-     * @return IUser
-     */
-    public function getUser()
-    {
-        return $this->user;
     }
 
     /**

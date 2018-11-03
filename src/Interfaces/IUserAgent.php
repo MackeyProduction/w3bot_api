@@ -20,11 +20,6 @@ interface IUserAgent
     public function getId();
 
     /**
-     * @return IUser
-     */
-    public function getUser();
-
-    /**
      * @return IOperatingSystem
      */
     public function getOperatingSystem();

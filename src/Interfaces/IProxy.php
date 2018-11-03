@@ -15,6 +15,11 @@ namespace App\Interfaces;
 interface IProxy
 {
     /**
+     * @return int|null
+     */
+    public function getId(): ?int;
+
+    /**
      * @return string
      */
     public function getName();

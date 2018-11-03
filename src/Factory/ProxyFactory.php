@@ -2,19 +2,18 @@
 /**
  * Created by PhpStorm.
  * User: Til Anheier
- * Date: 28.10.2018
- * Time: 14:54
+ * Date: 03.11.2018
+ * Time: 15:18
  */
 
 namespace App\Factory;
 
-use App\Interfaces\IUProxy;
 use App\Model\ProxyResponseModel;
 
 class ProxyFactory extends AbstractResponseModel
 {
     /**
-     * @param IUProxy $entity
+     * @param $entity
      * @return ProxyResponseModel
      */
     protected function fetch($entity)

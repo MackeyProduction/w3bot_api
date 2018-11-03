@@ -8,8 +8,10 @@
 
 namespace App\Controller;
 
+use App\Entity\UserAgent;
 use App\Entity\UUA;
 use App\Factory\UserAgentFactory;
+use App\Factory\UUserAgentFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\ITokenService;
 use App\Model\UserAgentResponseModel;
@@ -28,23 +30,42 @@ class UserAgentController extends Controller
      * @Route("/api/agent", methods={"GET"})
      * @SWG\Response(
      *     response=200,
-     *     description="Returns a list of user agent from the user.",
+     *     description="Returns a list of user agents.",
      *     @Model(type=UserAgentResponseModel::class, groups={"full"})
      * )
      * @SWG\Tag(name="agent")
-     * @Security(name="Bearer")
      *
-     * @param Request $request
      * @param ICollectionService $collectionService
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
+    public function fetchUserAgents(ICollectionService $collectionService)
     {
-        $data = $this->getDoctrine()->getRepository(UUA::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
+        $data = $this->getDoctrine()->getRepository(UserAgent::class)->findAll();
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
         return $this->json($result);
+    }
+
+    /**
+     * Gets a user agent by id.
+     *
+     * @Route("/api/agent/{id}", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a user agent by id.",
+     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
+     * )
+     * @SWG\Tag(name="agent")
+     *
+     * @param $id
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @internal param ICollectionService $collectionService
+     */
+    public function fetchUserAgentById($id)
+    {
+        $data = UserAgentFactory::create($this->getDoctrine()->getRepository(UserAgent::class)->findBy(['id' => $id]))->getResponse();
+
+        return $this->json($data);
     }
 
     /**

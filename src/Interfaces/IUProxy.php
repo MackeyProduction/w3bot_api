@@ -15,6 +15,11 @@ namespace App\Interfaces;
 interface IUProxy
 {
     /**
+     * @return int
+     */
+    public function getId();
+
+    /**
      * @return IProxy
      */
     public function getProxy();

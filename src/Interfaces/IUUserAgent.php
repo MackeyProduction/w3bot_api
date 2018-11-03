@@ -15,6 +15,11 @@ namespace App\Interfaces;
 interface IUUserAgent
 {
     /**
+     * @return int
+     */
+    public function getId();
+
+    /**
      * @return IUser
      */
     public function getUser();
