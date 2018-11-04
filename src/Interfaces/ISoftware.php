@@ -8,6 +8,9 @@
 
 namespace App\Interfaces;
 
+use App\Entity\LayoutEngine;
+use App\Entity\SoftwareName;
+
 /**
  * Interface ISoftware
  * @package App\Interfaces
@@ -20,9 +23,9 @@ interface ISoftware
     public function getId(): ?int;
 
     /**
-     * @return null|string
+     * @return null|SoftwareName
      */
-    public function getName(): ?string;
+    public function getName(): ?SoftwareName;
 
     /**
      * @return null|string
@@ -30,9 +33,9 @@ interface ISoftware
     public function getVersion(): ?string;
 
     /**
-     * @return null|string
+     * @return null|LayoutEngine
      */
-    public function getLeName(): ?string;
+    public function getLeName(): ?LayoutEngine;
 
     /**
      * @return null|string

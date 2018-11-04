@@ -8,6 +8,11 @@
 
 namespace App\Controller;
 
+use App\Entity\LayoutEngine;
+use App\Entity\OperatingSystem;
+use App\Entity\OperatingSystemName;
+use App\Entity\Software;
+use App\Entity\SoftwareName;
 use App\Entity\UserAgent;
 use App\Entity\UUA;
 use App\Factory\UserAgentFactory;
@@ -80,10 +85,72 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      * @Security(name="Bearer")
      *
+     * @param Request $request
+     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postUserAgent()
+    public function postUserAgent(Request $request, ITokenService $tokenService)
     {
-        return $this->json("");
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $agent = $request->request->get("agent");
+            $softwareName = $request->request->get("softwareName");
+            $softwareVersion = $request->request->get("softwareVersion");
+            $softwareExtras = $request->request->get("softwareExtras");
+            $layoutEngine = $request->request->get("layoutEngine");
+            $layoutEngineVersion = $request->request->get("layoutEngineVersion");
+            $osName = $request->request->get("osName");
+            $osVersion = $request->request->get("osVersion");
+
+            if ($softwareName != "" && $softwareVersion != "" && $layoutEngine != "" && $layoutEngineVersion != "" && $osName != "" && $osVersion != "" && $agent != "") {
+//                $softwareResult = $this->getDoctrine()->getRepository(SoftwareName::class)->findBy(['name' => $softwareName]);
+//                $layoutEngineResult = $layoutEngineResult = $this->getDoctrine()->getRepository(LayoutEngine::class)->findBy(['name' => $layoutEngine]);
+//                $osResult = $osResult = $this->getDoctrine()->getRepository(OperatingSystemName::class)->findBy(['name' => $osName]);
+
+                $userAgentEntity = new UserAgent();
+                $softwareEntity = new Software();
+                $osEntity = new OperatingSystem();
+
+//                if ($softwareResult == null) {
+                    $softwareNameEntity = new SoftwareName();
+                    $softwareNameEntity->setName($softwareName);
+                    $softwareEntity->setName($softwareNameEntity);
+
+//                    $entityManager->persist($softwareEntity);
+//                }
+
+//                if ($layoutEngineResult == null) {
+                    $layoutEngineEntity = new LayoutEngine();
+                    $layoutEngineEntity->setName($layoutEngine);
+                    $softwareEntity->setLeName($layoutEngineEntity);
+
+//                    $entityManager->persist($softwareEntity);
+//                }
+
+//                if ($osResult == null) {
+                    $osNameEntity = new OperatingSystemName();
+                    $osNameEntity->setName($osName);
+                    $osEntity->setName($osNameEntity);
+
+                    $userAgentEntity->setAgent($agent);
+                    $userAgentEntity->setSoftware($softwareEntity);
+                    $userAgentEntity->setOperatingSystem($osEntity);
+
+                $entityManager->persist($softwareEntity);
+                $entityManager->persist($osEntity);
+                $entityManager->persist($userAgentEntity);
+//                }
+
+                $entityManager->flush();
+
+                return $tokenService->getTokenResponse($request, ['response' => 'User agent inserted successfully.']);
+            } else {
+                return $tokenService->getTokenResponse($request, ['response' => 'User agent information incomplete. Check your credentials.']);
+            }
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 }

@@ -31,6 +31,11 @@ class UserAgent implements IUserAgent
     private $sId;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $agent;
+
+    /**
      * @ORM\ManyToOne(targetEntity="OperatingSystem")
      * @ORM\JoinColumn(name="os_id", referencedColumnName="id")
      */
@@ -74,16 +79,50 @@ class UserAgent implements IUserAgent
     /**
      * @return IOperatingSystem
      */
-    public function getOperatingSystem()
+    public function getOperatingSystem(): ?IOperatingSystem
     {
         return $this->operatingSystem;
     }
 
     /**
+     * @param IOperatingSystem $operatingSystem
+     * @return UserAgent|null
+     */
+    public function setOperatingSystem(IOperatingSystem $operatingSystem): self
+    {
+        $this->operatingSystem = $operatingSystem;
+
+        return $this;
+    }
+
+    /**
      * @return ISoftware
      */
-    public function getSoftware()
+    public function getSoftware(): ?ISoftware
     {
         return $this->software;
+    }
+
+    /**
+     * @param ISoftware $software
+     * @return UserAgent
+     */
+    public function setSoftware(ISoftware $software): self
+    {
+        $this->software = $software;
+
+        return $this;
+    }
+
+    public function getAgent(): ?string
+    {
+        return $this->agent;
+    }
+
+    public function setAgent($agent): self
+    {
+        $this->agent = $agent;
+
+        return $this;
     }
 }
