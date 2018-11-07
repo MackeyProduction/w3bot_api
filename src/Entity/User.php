@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Interfaces\IUser;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User implements IUser
+class User
 {
     /**
      * @ORM\Id()
@@ -29,9 +29,9 @@ class User implements IUser
     private $password;
 
     /**
-     * @var string
+     * @ORM\Column(type="datetime")
      */
-    private $plainPassword;
+    private $registerDate;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -39,19 +39,38 @@ class User implements IUser
     private $email;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Rank", inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $registerDate;
+    private $rank;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Proxy", inversedBy="users")
      */
-    private $gId;
+    private $up;
 
     /**
-     * @var (Role|string)[]
+     * @ORM\ManyToMany(targetEntity="App\Entity\UserAgent", inversedBy="users")
      */
-    private $roles;
+    private $uua;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Token", mappedBy="user")
+     */
+    private $tokens;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\LoginAttempts", mappedBy="user")
+     */
+    private $loginAttempts;
+
+    public function __construct()
+    {
+        $this->up = new ArrayCollection();
+        $this->uua = new ArrayCollection();
+        $this->tokens = new ArrayCollection();
+        $this->loginAttempts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +94,25 @@ class User implements IUser
         return $this->password;
     }
 
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getRegisterDate(): ?\DateTimeInterface
+    {
+        return $this->registerDate;
+    }
+
+    public function setRegisterDate(\DateTimeInterface $registerDate): self
+    {
+        $this->registerDate = $registerDate;
+
+        return $this;
+    }
+
     public function getEmail(): ?string
     {
         return $this->email;
@@ -87,89 +125,128 @@ class User implements IUser
         return $this;
     }
 
-    public function getRegisterDate(): ?\DateTime
+    public function getRank(): ?Rank
     {
-        return $this->registerDate;
+        return $this->rank;
     }
 
-    public function setRegisterDate(\DateTime $registerDate): self
+    public function setRank(?Rank $rank): self
     {
-        $this->registerDate = $registerDate;
-
-        return $this;
-    }
-
-    public function getGroupId(): ?int
-    {
-        return $this->gId;
-    }
-
-    public function setGroupId(int $gId): self
-    {
-        $this->gId = $gId;
+        $this->rank = $rank;
 
         return $this;
     }
 
     /**
-     * Returns the roles granted to the user.
-     *
-     *     public function getRoles()
-     *     {
-     *         return array('ROLE_USER');
-     *     }
-     *
-     * Alternatively, the roles might be stored on a ``roles`` property,
-     * and populated in any number of different ways when the user object
-     * is created.
-     *
-     * @return (Role|string)[] The user roles
+     * @return Collection|Proxy[]
      */
-    public function getRoles()
+    public function getUp(): Collection
     {
-        $this->roles = ['ROLE_USER'];
+        return $this->up;
+    }
 
-        return $this->roles;
+    public function addUp(Proxy $up): self
+    {
+        if (!$this->up->contains($up)) {
+            $this->up[] = $up;
+        }
+
+        return $this;
+    }
+
+    public function removeUp(Proxy $up): self
+    {
+        if ($this->up->contains($up)) {
+            $this->up->removeElement($up);
+        }
+
+        return $this;
     }
 
     /**
-     * Returns the salt that was originally used to encode the password.
-     *
-     * This can return null if the password was not encoded using a salt.
-     *
-     * @return string|null The salt
+     * @return Collection|UserAgent[]
      */
-    public function getSalt()
+    public function getUua(): Collection
     {
-        return null;
+        return $this->uua;
+    }
+
+    public function addUua(UserAgent $uua): self
+    {
+        if (!$this->uua->contains($uua)) {
+            $this->uua[] = $uua;
+        }
+
+        return $this;
+    }
+
+    public function removeUua(UserAgent $uua): self
+    {
+        if ($this->uua->contains($uua)) {
+            $this->uua->removeElement($uua);
+        }
+
+        return $this;
     }
 
     /**
-     * Removes sensitive data from the user.
-     *
-     * This is important if, at any given point, sensitive information like
-     * the plain-text password is stored on this object.
+     * @return Collection|Token[]
      */
-    public function eraseCredentials()
+    public function getTokens(): Collection
     {
-        return null;
+        return $this->tokens;
+    }
+
+    public function addToken(Token $token): self
+    {
+        if (!$this->tokens->contains($token)) {
+            $this->tokens[] = $token;
+            $token->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeToken(Token $token): self
+    {
+        if ($this->tokens->contains($token)) {
+            $this->tokens->removeElement($token);
+            // set the owning side to null (unless already changed)
+            if ($token->getUser() === $this) {
+                $token->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
     /**
-     * @return string
+     * @return Collection|LoginAttempts[]
      */
-    public function getPlainPassword(): string
+    public function getLoginAttempts(): Collection
     {
-        return $this->plainPassword;
+        return $this->loginAttempts;
     }
 
-    /**
-     * @param string $plainPassword
-     * @return $this
-     */
-    public function setPlainPassword(string $plainPassword)
+    public function addLoginAttempt(LoginAttempts $loginAttempt): self
     {
-        $this->plainPassword = $plainPassword;
+        if (!$this->loginAttempts->contains($loginAttempt)) {
+            $this->loginAttempts[] = $loginAttempt;
+            $loginAttempt->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLoginAttempt(LoginAttempts $loginAttempt): self
+    {
+        if ($this->loginAttempts->contains($loginAttempt)) {
+            $this->loginAttempts->removeElement($loginAttempt);
+            // set the owning side to null (unless already changed)
+            if ($loginAttempt->getUser() === $this) {
+                $loginAttempt->setUser(null);
+            }
+        }
 
         return $this;
     }

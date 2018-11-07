@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\SoftwareNameRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\RankRepository")
  */
-class SoftwareName
+class Rank
 {
     /**
      * @ORM\Id()
@@ -24,13 +24,13 @@ class SoftwareName
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Software", mappedBy="softwareName")
+     * @ORM\OneToMany(targetEntity="App\Entity\User", mappedBy="rank")
      */
-    private $softwares;
+    private $users;
 
     public function __construct()
     {
-        $this->softwares = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -51,30 +51,30 @@ class SoftwareName
     }
 
     /**
-     * @return Collection|Software[]
+     * @return Collection|User[]
      */
-    public function getSoftwares(): Collection
+    public function getUsers(): Collection
     {
-        return $this->softwares;
+        return $this->users;
     }
 
-    public function addSoftware(Software $software): self
+    public function addUser(User $user): self
     {
-        if (!$this->softwares->contains($software)) {
-            $this->softwares[] = $software;
-            $software->setSoftwareName($this);
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->setRank($this);
         }
 
         return $this;
     }
 
-    public function removeSoftware(Software $software): self
+    public function removeUser(User $user): self
     {
-        if ($this->softwares->contains($software)) {
-            $this->softwares->removeElement($software);
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
             // set the owning side to null (unless already changed)
-            if ($software->getSoftwareName() === $this) {
-                $software->setSoftwareName(null);
+            if ($user->getRank() === $this) {
+                $user->setRank(null);
             }
         }
 

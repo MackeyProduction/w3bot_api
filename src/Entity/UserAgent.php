@@ -2,16 +2,14 @@
 
 namespace App\Entity;
 
-use App\Interfaces\IOperatingSystem;
-use App\Interfaces\ISoftware;
-use App\Interfaces\IUser;
-use App\Interfaces\IUserAgent;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserAgentRepository")
  */
-class UserAgent implements IUserAgent
+class UserAgent
 {
     /**
      * @ORM\Id()
@@ -21,97 +19,35 @@ class UserAgent implements IUserAgent
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $osId;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $sId;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $agent;
 
     /**
-     * @ORM\ManyToOne(targetEntity="OperatingSystem")
-     * @ORM\JoinColumn(name="os_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Software", inversedBy="userAgents")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $software;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\OperatingSystem", inversedBy="userAgents")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $operatingSystem;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Software")
-     * @ORM\JoinColumn(name="s_id", referencedColumnName="id")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="uua")
      */
-    private $software;
+    private $users;
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getOsId(): ?int
-    {
-        return $this->osId;
-    }
-
-    public function setOsId(int $osId): self
-    {
-        $this->osId = $osId;
-
-        return $this;
-    }
-
-    public function getSId(): ?int
-    {
-        return $this->sId;
-    }
-
-    public function setSId(int $sId): self
-    {
-        $this->sId = $sId;
-
-        return $this;
-    }
-
-    /**
-     * @return IOperatingSystem
-     */
-    public function getOperatingSystem(): ?IOperatingSystem
-    {
-        return $this->operatingSystem;
-    }
-
-    /**
-     * @param IOperatingSystem $operatingSystem
-     * @return UserAgent|null
-     */
-    public function setOperatingSystem(IOperatingSystem $operatingSystem): self
-    {
-        $this->operatingSystem = $operatingSystem;
-
-        return $this;
-    }
-
-    /**
-     * @return ISoftware
-     */
-    public function getSoftware(): ?ISoftware
-    {
-        return $this->software;
-    }
-
-    /**
-     * @param ISoftware $software
-     * @return UserAgent
-     */
-    public function setSoftware(ISoftware $software): self
-    {
-        $this->software = $software;
-
-        return $this;
     }
 
     public function getAgent(): ?string
@@ -119,9 +55,61 @@ class UserAgent implements IUserAgent
         return $this->agent;
     }
 
-    public function setAgent($agent): self
+    public function setAgent(string $agent): self
     {
         $this->agent = $agent;
+
+        return $this;
+    }
+
+    public function getSoftware(): ?Software
+    {
+        return $this->software;
+    }
+
+    public function setSoftware(?Software $software): self
+    {
+        $this->software = $software;
+
+        return $this;
+    }
+
+    public function getOperatingSystem(): ?OperatingSystem
+    {
+        return $this->operatingSystem;
+    }
+
+    public function setOperatingSystem(?OperatingSystem $operatingSystem): self
+    {
+        $this->operatingSystem = $operatingSystem;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addUua($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $user->removeUua($this);
+        }
 
         return $this;
     }

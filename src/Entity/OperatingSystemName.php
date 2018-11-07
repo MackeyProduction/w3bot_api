@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -21,6 +23,16 @@ class OperatingSystemName
      */
     private $name;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\OperatingSystem", mappedBy="operatingSystemName")
+     */
+    private $operatingSystems;
+
+    public function __construct()
+    {
+        $this->operatingSystems = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -34,6 +46,37 @@ class OperatingSystemName
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|OperatingSystem[]
+     */
+    public function getOperatingSystems(): Collection
+    {
+        return $this->operatingSystems;
+    }
+
+    public function addOperatingSystem(OperatingSystem $operatingSystem): self
+    {
+        if (!$this->operatingSystems->contains($operatingSystem)) {
+            $this->operatingSystems[] = $operatingSystem;
+            $operatingSystem->setOperatingSystemName($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOperatingSystem(OperatingSystem $operatingSystem): self
+    {
+        if ($this->operatingSystems->contains($operatingSystem)) {
+            $this->operatingSystems->removeElement($operatingSystem);
+            // set the owning side to null (unless already changed)
+            if ($operatingSystem->getOperatingSystemName() === $this) {
+                $operatingSystem->setOperatingSystemName(null);
+            }
+        }
 
         return $this;
     }

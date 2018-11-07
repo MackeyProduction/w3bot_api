@@ -2,14 +2,14 @@
 
 namespace App\Entity;
 
-use App\Interfaces\ISoftware;
-use App\Interfaces\ISoftwareExtras;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\SoftwareRepository")
  */
-class Software implements ISoftware
+class Software
 {
     /**
      * @ORM\Id()
@@ -19,63 +19,45 @@ class Software implements ISoftware
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $snId;
-
-    /**
      * @ORM\Column(type="string", length=255)
      */
     private $version;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="App\Entity\SoftwareExtras", inversedBy="softwares")
      */
-    private $leId;
+    private $softwareExtras;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\SoftwareName", inversedBy="softwares")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $softwareName;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LayoutEngine", inversedBy="softwares")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $layoutEngine;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $le_version;
+    private $LeVersion;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserAgent", mappedBy="software")
      */
-    private $seId;
+    private $userAgents;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="SoftwareName")
-     * @ORM\JoinColumn(name="sn_id", referencedColumnName="id")
-     */
-    private $name;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="LayoutEngine")
-     * @ORM\JoinColumn(name="le_id", referencedColumnName="id")
-     */
-    private $le_name;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="SoftwareExtras")
-     * @ORM\JoinColumn(name="se_id", referencedColumnName="id")
-     */
-    private $extras;
+    public function __construct()
+    {
+        $this->userAgents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?SoftwareName
-    {
-        return $this->name;
-    }
-
-    public function setName(?SoftwareName $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getVersion(): ?string
@@ -90,71 +72,82 @@ class Software implements ISoftware
         return $this;
     }
 
-    public function getLeName(): ?LayoutEngine
+    public function getSoftwareExtras(): ?SoftwareExtras
     {
-        return $this->le_name;
+        return $this->softwareExtras;
     }
 
-    public function setLeName(LayoutEngine $le_name): self
+    public function setSoftwareExtras(?SoftwareExtras $softwareExtras): self
     {
-        $this->le_name = $le_name;
+        $this->softwareExtras = $softwareExtras;
+
+        return $this;
+    }
+
+    public function getSoftwareName(): ?SoftwareName
+    {
+        return $this->softwareName;
+    }
+
+    public function setSoftwareName(?SoftwareName $softwareName): self
+    {
+        $this->softwareName = $softwareName;
+
+        return $this;
+    }
+
+    public function getLayoutEngine(): ?LayoutEngine
+    {
+        return $this->layoutEngine;
+    }
+
+    public function setLayoutEngine(?LayoutEngine $layoutEngine): self
+    {
+        $this->layoutEngine = $layoutEngine;
 
         return $this;
     }
 
     public function getLeVersion(): ?string
     {
-        return $this->le_version;
+        return $this->LeVersion;
     }
 
-    public function setLeVersion(string $le_version): self
+    public function setLeVersion(string $LeVersion): self
     {
-        $this->le_version = $le_version;
-
-        return $this;
-    }
-
-    public function getSnId(): ?int
-    {
-        return $this->snId;
-    }
-
-    public function setSnId($snId): self
-    {
-        $this->snId = $snId;
-
-        return $this;
-    }
-
-    public function getLeId(): ?int
-    {
-        return $this->leId;
-    }
-
-    public function setLeId($leId): self
-    {
-        $this->leId = $leId;
-
-        return $this;
-    }
-
-    public function getSeId(): ?int
-    {
-        return $this->seId;
-    }
-
-    public function setSeId($seId): self
-    {
-        $this->seId = $seId;
+        $this->LeVersion = $LeVersion;
 
         return $this;
     }
 
     /**
-     * @return ISoftwareExtras
+     * @return Collection|UserAgent[]
      */
-    public function getExtras()
+    public function getUserAgents(): Collection
     {
-        return $this->extras;
+        return $this->userAgents;
+    }
+
+    public function addUserAgent(UserAgent $userAgent): self
+    {
+        if (!$this->userAgents->contains($userAgent)) {
+            $this->userAgents[] = $userAgent;
+            $userAgent->setSoftware($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAgent(UserAgent $userAgent): self
+    {
+        if ($this->userAgents->contains($userAgent)) {
+            $this->userAgents->removeElement($userAgent);
+            // set the owning side to null (unless already changed)
+            if ($userAgent->getSoftware() === $this) {
+                $userAgent->setSoftware(null);
+            }
+        }
+
+        return $this;
     }
 }
