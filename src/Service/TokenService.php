@@ -9,6 +9,7 @@
 namespace App\Service;
 
 use App\Interfaces\ITokenService;
+use Lexik\Bundle\JWTAuthenticationBundle\Exception\ExpiredTokenException;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Guard\JWTTokenAuthenticator as BaseAuthenticator;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor;
@@ -61,9 +62,17 @@ class TokenService extends BaseAuthenticator implements ITokenService
      */
     public function getTokenResponse(Request $request, $data = [])
     {
-        return JsonResponse::create([
-            'token' => $this->getCredentials($request),
-            'payload' => $this->getPayload($request),
-        ] + $data, JsonResponse::HTTP_OK);
+        try {
+            if ($request->headers->get("Authorization")) {
+                return JsonResponse::create([
+                    'token' => $this->getCredentials($request),
+                    'payload' => $this->getPayload($request) + $data,
+                ], JsonResponse::HTTP_OK);
+            }
+        } catch (ExpiredTokenException $exception) {
+            return JsonResponse::create(['response' => 'The current token is expired. Please refresh your token.'], JsonResponse::HTTP_FORBIDDEN);
+        }
+
+        return JsonResponse::create([ "response" => "An error occurred. Please check your credentials." ], JsonResponse::HTTP_BAD_REQUEST);
     }
 }

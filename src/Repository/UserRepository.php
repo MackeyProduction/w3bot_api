@@ -19,6 +19,36 @@ class UserRepository extends ServiceEntityRepository
         parent::__construct($registry, User::class);
     }
 
+    public function findOneByUserIdAndUserAgentId($userId, $userAgentId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.uua', 'uua')
+            ->addSelect('uua')
+            ->andWhere('u.id = :userId')
+            ->andWhere('uua.id = :userAgentId')
+            ->setParameter('userId', $userId)
+            ->setParameter('userAgentId', $userAgentId)
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult()
+            ;
+    }
+
+    public function findOneByUserIdAndProxyId($userId, $proxyId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->innerJoin('u.up', 'up')
+            ->addSelect('up')
+            ->andWhere('u.id = :userId')
+            ->andWhere('up.id = :proxyId')
+            ->setParameter('userId', $userId)
+            ->setParameter('proxyId', $proxyId)
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult()
+            ;
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

@@ -15,7 +15,6 @@ use App\Entity\Software;
 use App\Entity\SoftwareExtras;
 use App\Entity\SoftwareName;
 use App\Entity\UserAgent;
-use App\Entity\UUA;
 use App\Factory\UserAgentFactory;
 use App\Factory\UUserAgentFactory;
 use App\Interfaces\ICollectionService;
