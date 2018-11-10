@@ -39,7 +39,7 @@ class UserController extends Controller
      */
     public function fetchUser(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
     {
-        $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
+        $data = $this->getDoctrine()->getRepository(User::class)->findAll();
         $result = $collectionService->getCollection(UserFactory::class, $data);
 
         return $tokenService->getTokenResponse($request, [ 'data' => $result ]);

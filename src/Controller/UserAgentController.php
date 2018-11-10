@@ -12,6 +12,7 @@ use App\Entity\LayoutEngine;
 use App\Entity\OperatingSystem;
 use App\Entity\OperatingSystemName;
 use App\Entity\Software;
+use App\Entity\SoftwareExtras;
 use App\Entity\SoftwareName;
 use App\Entity\UserAgent;
 use App\Entity\UUA;
@@ -105,47 +106,91 @@ class UserAgentController extends Controller
             $osVersion = $request->request->get("osVersion");
 
             if ($softwareName != "" && $softwareVersion != "" && $layoutEngine != "" && $layoutEngineVersion != "" && $osName != "" && $osVersion != "" && $agent != "") {
-//                $softwareResult = $this->getDoctrine()->getRepository(SoftwareName::class)->findBy(['name' => $softwareName]);
-//                $layoutEngineResult = $layoutEngineResult = $this->getDoctrine()->getRepository(LayoutEngine::class)->findBy(['name' => $layoutEngine]);
-//                $osResult = $osResult = $this->getDoctrine()->getRepository(OperatingSystemName::class)->findBy(['name' => $osName]);
+                $agentResult = $this->getDoctrine()->getRepository(UserAgent::class)->findOneBy(['agent' => $agent]);
+                $softwareResult = $this->getDoctrine()->getRepository(UserAgent::class)->findOneBySoftwareNameAndVersion($softwareName, $softwareVersion);
+                $layoutEngineResult = $layoutEngineResult = $this->getDoctrine()->getRepository(UserAgent::class)->findOneByLayoutEngineAndVersion($layoutEngine, $layoutEngineVersion);
+                $osResult = $this->getDoctrine()->getRepository(UserAgent::class)->findOneByOperatingSystemNameAndVersion($osName, $osVersion);
+                $softwareExtrasResult = $this->getDoctrine()->getRepository(SoftwareExtras::class)->findOneBy(['info' => $softwareExtras]);
+                $softwareNameResult = $this->getDoctrine()->getRepository(SoftwareName::class)->findOneBy(['name' => $softwareName]);
+                $layoutEngineNameResult = $this->getDoctrine()->getRepository(LayoutEngine::class)->findOneBy(['name' => $layoutEngine]);
+                $osNameResult = $this->getDoctrine()->getRepository(OperatingSystemName::class)->findOneBy(['name' => $osName]);
 
-                $userAgentEntity = new UserAgent();
-                $softwareEntity = new Software();
-                $osEntity = new OperatingSystem();
+                // check if entry already exists
+                if ($agentResult == null && $softwareResult == null && $layoutEngineResult == null && $osResult == null) {
+                    $userAgentEntity = new UserAgent();
+                    $softwareEntity = new Software();
+                    $osEntity = new OperatingSystem();
 
-//                if ($softwareResult == null) {
-                    $softwareNameEntity = new SoftwareName();
-                    $softwareNameEntity->setName($softwareName);
-                    $softwareEntity->setName($softwareNameEntity);
+                    // set software name and version in software entity
+                    if ($softwareNameResult == null) {
+                        $softwareNameEntity = new SoftwareName();
+                        $softwareNameEntity->setName($softwareName);
+                        $softwareEntity->setVersion($softwareVersion);
+                        $softwareEntity->setSoftwareName($softwareNameEntity);
 
-//                    $entityManager->persist($softwareEntity);
-//                }
+                        $entityManager->persist($softwareNameEntity);
+                    } else {
+                        /** @var SoftwareName $softwareNameResult */
+                        $softwareEntity->setSoftwareName($softwareNameResult);
+                        $softwareEntity->setVersion($softwareVersion);
+                    }
 
-//                if ($layoutEngineResult == null) {
-                    $layoutEngineEntity = new LayoutEngine();
-                    $layoutEngineEntity->setName($layoutEngine);
-                    $softwareEntity->setLeName($layoutEngineEntity);
+                    // set layout engine name and version in software entity
+                    if ($layoutEngineNameResult == null) {
+                        $layoutEngineEntity = new LayoutEngine();
+                        $layoutEngineEntity->setName($layoutEngine);
+                        $softwareEntity->setLeVersion($layoutEngineVersion);
+                        $softwareEntity->setLayoutEngine($layoutEngineEntity);
 
-//                    $entityManager->persist($softwareEntity);
-//                }
+                        $entityManager->persist($layoutEngineEntity);
+                    } else {
+                        /** @var LayoutEngine $layoutEngineNameResult */
+                        $softwareEntity->setLayoutEngine($layoutEngineNameResult);
+                        $softwareEntity->setLeVersion($layoutEngineVersion);
+                    }
 
-//                if ($osResult == null) {
-                    $osNameEntity = new OperatingSystemName();
-                    $osNameEntity->setName($osName);
-                    $osEntity->setName($osNameEntity);
+                    // set operating system name and version in operating system
+                    if ($osNameResult == null) {
+                        $osNameEntity = new OperatingSystemName();
+                        $osNameEntity->setName($osName);
+                        $osEntity->setVersion($osVersion);
+                        $osEntity->setOperatingSystemName($osNameEntity);
+
+                        $entityManager->persist($osNameEntity);
+                    } else {
+                        /** @var OperatingSystemName $osNameResult */
+                        $osEntity->setOperatingSystemName($osNameResult);
+                        $osEntity->setVersion($osVersion);
+                    }
+
+                    if ($softwareExtrasResult == null) {
+                        $softwareExtrasEntity = new SoftwareExtras();
+
+                        $softwareExtrasEntity->setInfo($softwareExtras);
+                        $softwareEntity->setSoftwareExtras($softwareExtrasEntity);
+
+                        $entityManager->persist($softwareExtrasEntity);
+                    } else {
+                        /** @var SoftwareExtras $softwareExtrasResult */
+                        $softwareEntity->setSoftwareExtras($softwareExtrasResult);
+                    }
 
                     $userAgentEntity->setAgent($agent);
                     $userAgentEntity->setSoftware($softwareEntity);
                     $userAgentEntity->setOperatingSystem($osEntity);
 
-                $entityManager->persist($softwareEntity);
-                $entityManager->persist($osEntity);
-                $entityManager->persist($userAgentEntity);
-//                }
+                    // persist entities
+                    $entityManager->persist($softwareEntity);
+                    $entityManager->persist($osEntity);
+                    $entityManager->persist($userAgentEntity);
 
-                $entityManager->flush();
+                    // push to database
+                    $entityManager->flush();
 
-                return $tokenService->getTokenResponse($request, ['response' => 'User agent inserted successfully.']);
+                    return $tokenService->getTokenResponse($request, ['response' => 'User agent inserted successfully.']);
+                } else {
+                    return $tokenService->getTokenResponse($request, ['response' => 'User agent already exists.']);
+                }
             } else {
                 return $tokenService->getTokenResponse($request, ['response' => 'User agent information incomplete. Check your credentials.']);
             }

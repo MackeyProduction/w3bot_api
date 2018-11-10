@@ -19,6 +19,57 @@ class UserAgentRepository extends ServiceEntityRepository
         parent::__construct($registry, UserAgent::class);
     }
 
+    public function findOneBySoftwareNameAndVersion($softwareName, $version): ?UserAgent
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.software', 's')
+            ->addSelect('s')
+            ->innerJoin('s.softwareName', 'sn')
+            ->addSelect('sn')
+            ->andWhere('sn.name = :softwareName')
+            ->andWhere('s.version = :version')
+            ->setParameter('softwareName', $softwareName)
+            ->setParameter('version', $version)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
+    public function findOneByLayoutEngineAndVersion($layoutEngineName, $version): ?UserAgent
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.software', 's')
+            ->addSelect('s')
+            ->innerJoin('s.layoutEngine', 'le')
+            ->addSelect('le')
+            ->andWhere('le.name = :layoutEngineName')
+            ->andWhere('s.LeVersion = :version')
+            ->setParameter('layoutEngineName', $layoutEngineName)
+            ->setParameter('version', $version)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
+    public function findOneByOperatingSystemNameAndVersion($osName, $version): ?UserAgent
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.operatingSystem', 'o')
+            ->addSelect('o')
+            ->innerJoin('o.operatingSystemName', 'osn')
+            ->addSelect('osn')
+            ->andWhere('osn.name = :operatingSystemName')
+            ->andWhere('o.version = :version')
+            ->setParameter('operatingSystemName', $osName)
+            ->setParameter('version', $version)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
 //    /**
 //     * @return UserAgent[] Returns an array of UserAgent objects
 //     */

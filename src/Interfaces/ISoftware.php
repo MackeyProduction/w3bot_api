@@ -25,7 +25,7 @@ interface ISoftware
     /**
      * @return null|SoftwareName
      */
-    public function getName(): ?SoftwareName;
+    public function getSoftwareName(): ?SoftwareName;
 
     /**
      * @return null|string
@@ -35,7 +35,7 @@ interface ISoftware
     /**
      * @return null|LayoutEngine
      */
-    public function getLeName(): ?LayoutEngine;
+    public function getLayoutEngine(): ?LayoutEngine;
 
     /**
      * @return null|string

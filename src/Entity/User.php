@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Interfaces\IUser;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  */
-class User
+class User implements IUser
 {
     /**
      * @ORM\Id()
@@ -27,6 +28,8 @@ class User
      * @ORM\Column(type="string", length=255)
      */
     private $password;
+
+    private $plainPassword;
 
     /**
      * @ORM\Column(type="datetime")
@@ -101,12 +104,12 @@ class User
         return $this;
     }
 
-    public function getRegisterDate(): ?\DateTimeInterface
+    public function getRegisterDate(): ?\DateTime
     {
         return $this->registerDate;
     }
 
-    public function setRegisterDate(\DateTimeInterface $registerDate): self
+    public function setRegisterDate(\DateTime $registerDate): self
     {
         $this->registerDate = $registerDate;
 
@@ -247,6 +250,18 @@ class User
                 $loginAttempt->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword($plainPassword): self
+    {
+        $this->plainPassword = $plainPassword;
 
         return $this;
     }

@@ -24,7 +24,7 @@ interface IOperatingSystem
     /**
      * @return null|OperatingSystemName
      */
-    public function getName(): ?OperatingSystemName;
+    public function getOperatingSystemName(): ?OperatingSystemName;
 
     /**
      * @return null|string
