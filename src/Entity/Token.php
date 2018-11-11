@@ -17,19 +17,25 @@ class Token
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="text")
      */
     private $token;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="datetime")
      */
-    private $uId;
+    private $createDate;
 
     /**
      * @ORM\Column(type="datetime")
      */
     private $expireDate;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="tokens")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $user;
 
     public function getId(): ?int
     {
@@ -48,6 +54,18 @@ class Token
         return $this;
     }
 
+    public function getCreateDate(): ?\DateTimeInterface
+    {
+        return $this->createDate;
+    }
+
+    public function setCreateDate(\DateTimeInterface $createDate): self
+    {
+        $this->createDate = $createDate;
+
+        return $this;
+    }
+
     public function getExpireDate(): ?\DateTimeInterface
     {
         return $this->expireDate;
@@ -60,14 +78,14 @@ class Token
         return $this;
     }
 
-    public function getUId(): ?int
+    public function getUser(): ?User
     {
-        return $this->uId;
+        return $this->user;
     }
 
-    public function setUId(int $uId): self
+    public function setUser(?User $user): self
     {
-        $this->uId = $uId;
+        $this->user = $user;
 
         return $this;
     }

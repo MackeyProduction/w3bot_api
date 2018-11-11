@@ -8,6 +8,7 @@
 
 namespace App\Interfaces;
 
+use App\Response\AuthorizationSuccessResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,8 +32,16 @@ interface ITokenService
 
     /**
      * @param Request $request
+     * @param string $responseType
      * @param array $data
      * @return JsonResponse
      */
-    public function getTokenResponse(Request $request, $data = []);
+    public function getTokenResponse(Request $request, string $responseType = AuthorizationSuccessResponse::class, $data = []);
+
+    /**
+     * @param $oldToken
+     * @param IUserService $userService
+     * @return JsonResponse
+     */
+    public function refreshToken($oldToken, IUserService $userService);
 }

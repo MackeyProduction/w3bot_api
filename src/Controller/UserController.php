@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\UP;
+use App\Entity\Proxy;
 use App\Entity\User;
-use App\Entity\UUA;
+use App\Entity\UserAgent;
 use App\Factory\UProxyFactory;
 use App\Factory\UUserAgentFactory;
 use App\Factory\UserFactory;
@@ -13,6 +13,14 @@ use App\Interfaces\ITokenService;
 use App\Model\UserResponseModel;
 use App\Model\UUserAgentResponseModel;
 use App\Model\UProxyResponseModel;
+use App\Response\ProxyExistsResponse;
+use App\Response\ProxyFailedResponse;
+use App\Response\ProxySuccessResponse;
+use App\Response\QueryFetchedSuccessResponse;
+use App\Response\QueryNotExistResponse;
+use App\Response\UserAgentExistsResponse;
+use App\Response\UserAgentFailedResponse;
+use App\Response\UserAgentSuccessResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,10 +47,15 @@ class UserController extends Controller
      */
     public function fetchUser(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
     {
-        $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
-        $result = $collectionService->getCollection(UserFactory::class, $data);
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $data = $this->getDoctrine()->getRepository(User::class)->findAll();
+            $result = $collectionService->getCollection(UserFactory::class, $data);
 
-        return $tokenService->getTokenResponse($request, [ 'data' => $result ]);
+            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 
     /**
@@ -64,10 +77,15 @@ class UserController extends Controller
      */
     public function fetchUserAgents(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
     {
-        $data = $this->getDoctrine()->getRepository(UUA::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
-        $result = $collectionService->getCollection(UUserAgentFactory::class, $data);
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
+            $result = $collectionService->getCollection(UUserAgentFactory::class, $data);
 
-        return $this->json($result);
+            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 
     /**
@@ -82,11 +100,46 @@ class UserController extends Controller
      * @SWG\Tag(name="user")
      * @Security(name="Bearer")
      *
+     * @param Request $request
+     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postUserAgent()
+    public function postUserAgent(Request $request, ITokenService $tokenService)
     {
-        return $this->json("");
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $userId = $request->request->get("userId");
+            $userAgentId = $request->request->get("userAgentId");
+
+            if ($userId != "" && $userAgentId != "") {
+                $userResult = $this->getDoctrine()->getRepository(User::class)->find($userId);
+                $userAgentResult = $this->getDoctrine()->getRepository(UserAgent::class)->find($userAgentId);
+
+                if ($userResult != null && $userAgentResult != null) {
+                    $uuaResult = $this->getDoctrine()->getRepository(User::class)->findOneByUserIdAndUserAgentId($userId, $userAgentId);
+
+                    if ($uuaResult == null) {
+                        /** @var UserAgent $userAgentResult */
+                        $userResult->addUua($userAgentResult);
+
+                        $entityManager->persist($userResult);
+                        $entityManager->flush();
+
+                        return $tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
+                    } else {
+                        return $tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
+                    }
+                } else {
+                    return $tokenService->getTokenResponse($request, QueryNotExistResponse::class);
+                }
+            } else {
+                return $tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
+            }
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 
     /**
@@ -108,10 +161,15 @@ class UserController extends Controller
      */
     public function fetchProxies(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
     {
-        $data = $this->getDoctrine()->getRepository(UP::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
-        $result = $collectionService->getCollection(UProxyFactory::class, $data);
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
+            $result = $collectionService->getCollection(UProxyFactory::class, $data);
 
-        return $this->json($result);
+            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 
     /**
@@ -126,10 +184,43 @@ class UserController extends Controller
      * @SWG\Tag(name="user")
      * @Security(name="Bearer")
      *
+     * @param Request $request
+     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postProxy()
+    public function postProxy(Request $request, ITokenService $tokenService)
     {
-        return $this->json("");
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $userId = $request->request->get("userId");
+            $proxyId = $request->request->get("proxyId");
+
+            if ($userId != "" && $proxyId != "") {
+                $userResult = $this->getDoctrine()->getRepository(User::class)->find($userId);
+                $proxyResult = $this->getDoctrine()->getRepository(Proxy::class)->find($proxyId);
+
+                if ($userResult != null && $proxyResult != null) {
+                    $upResult = $this->getDoctrine()->getRepository(User::class)->findOneByUserIdAndProxyId($userId, $proxyId);
+
+                    if ($upResult == null) {
+                        /** @var Proxy $proxyResult*/
+                        $userResult->addUp($proxyResult);
+
+                        $entityManager->persist($userResult);
+                        $entityManager->flush();
+
+                        return $tokenService->getTokenResponse($request, ProxySuccessResponse::class);
+                    } else {
+                        return $tokenService->getTokenResponse($request, ProxyExistsResponse::class);
+                    }
+                }
+            } else {
+                return $tokenService->getTokenResponse($request, ProxyFailedResponse::class);
+            }
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 }

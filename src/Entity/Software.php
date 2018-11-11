@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Interfaces\ISoftware;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -20,38 +22,43 @@ class Software implements ISoftware
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
     private $version;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="App\Entity\SoftwareExtras", inversedBy="softwares")
      */
-    private $le_name;
+    private $softwareExtras;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\SoftwareName", inversedBy="softwares")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $softwareName;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\LayoutEngine", inversedBy="softwares")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $layoutEngine;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $le_version;
+    private $LeVersion;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UserAgent", mappedBy="software")
+     */
+    private $userAgents;
+
+    public function __construct()
+    {
+        $this->userAgents = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     public function getVersion(): ?string
@@ -66,26 +73,81 @@ class Software implements ISoftware
         return $this;
     }
 
-    public function getLeName(): ?string
+    public function getSoftwareExtras(): ?SoftwareExtras
     {
-        return $this->le_name;
+        return $this->softwareExtras;
     }
 
-    public function setLeName(string $le_name): self
+    public function setSoftwareExtras(?SoftwareExtras $softwareExtras): self
     {
-        $this->le_name = $le_name;
+        $this->softwareExtras = $softwareExtras;
+
+        return $this;
+    }
+
+    public function getSoftwareName(): ?SoftwareName
+    {
+        return $this->softwareName;
+    }
+
+    public function setSoftwareName(?SoftwareName $softwareName): self
+    {
+        $this->softwareName = $softwareName;
+
+        return $this;
+    }
+
+    public function getLayoutEngine(): ?LayoutEngine
+    {
+        return $this->layoutEngine;
+    }
+
+    public function setLayoutEngine(?LayoutEngine $layoutEngine): self
+    {
+        $this->layoutEngine = $layoutEngine;
 
         return $this;
     }
 
     public function getLeVersion(): ?string
     {
-        return $this->le_version;
+        return $this->LeVersion;
     }
 
-    public function setLeVersion(string $le_version): self
+    public function setLeVersion(string $LeVersion): self
     {
-        $this->le_version = $le_version;
+        $this->LeVersion = $LeVersion;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UserAgent[]
+     */
+    public function getUserAgents(): Collection
+    {
+        return $this->userAgents;
+    }
+
+    public function addUserAgent(UserAgent $userAgent): self
+    {
+        if (!$this->userAgents->contains($userAgent)) {
+            $this->userAgents[] = $userAgent;
+            $userAgent->setSoftware($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAgent(UserAgent $userAgent): self
+    {
+        if ($this->userAgents->contains($userAgent)) {
+            $this->userAgents->removeElement($userAgent);
+            // set the owning side to null (unless already changed)
+            if ($userAgent->getSoftware() === $this) {
+                $userAgent->setSoftware(null);
+            }
+        }
 
         return $this;
     }

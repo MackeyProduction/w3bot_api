@@ -5,6 +5,7 @@
         "php": "^7.0.8",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/annotations": "^1.6",
         "lexik/jwt-authentication-bundle": "^2.5",
         "nelmio/api-doc-bundle": "^3.3",
         "symfony/asset": "*",
@@ -13,7 +14,11 @@
         "symfony/framework-bundle": "*",
         "symfony/orm-pack": "^1.0",
         "symfony/twig-bundle": "*",
-        "symfony/yaml": "*"
+        "symfony/validator": "*",
+        "symfony/yaml": "*",
+        "white-october/pagerfanta-bundle": "^1.2",
+        "willdurand/hateoas": "^2.12",
+        "willdurand/hateoas-bundle": "^1.4"
     },
     "require-dev": {
         "symfony/dotenv": "*",

@@ -2,10 +2,9 @@
 
 namespace App\Entity;
 
-use App\Interfaces\IOperatingSystem;
-use App\Interfaces\ISoftware;
-use App\Interfaces\IUser;
 use App\Interfaces\IUserAgent;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -21,69 +20,98 @@ class UserAgent implements IUserAgent
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string", length=255)
      */
-    private $osId;
+    private $agent;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Software", inversedBy="userAgents")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $sId;
+    private $software;
 
     /**
-     * @ORM\ManyToOne(targetEntity="OperatingSystem")
-     * @ORM\JoinColumn(name="os_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="App\Entity\OperatingSystem", inversedBy="userAgents")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $operatingSystem;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Software")
-     * @ORM\JoinColumn(name="s_id", referencedColumnName="id")
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", mappedBy="uua")
      */
-    private $software;
+    private $users;
+
+    public function __construct()
+    {
+        $this->users = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getOsId(): ?int
+    public function getAgent(): ?string
     {
-        return $this->osId;
+        return $this->agent;
     }
 
-    public function setOsId(int $osId): self
+    public function setAgent(string $agent): self
     {
-        $this->osId = $osId;
+        $this->agent = $agent;
 
         return $this;
     }
 
-    public function getSId(): ?int
+    public function getSoftware(): ?Software
     {
-        return $this->sId;
+        return $this->software;
     }
 
-    public function setSId(int $sId): self
+    public function setSoftware(?Software $software): self
     {
-        $this->sId = $sId;
+        $this->software = $software;
 
         return $this;
     }
 
-    /**
-     * @return IOperatingSystem
-     */
-    public function getOperatingSystem()
+    public function getOperatingSystem(): ?OperatingSystem
     {
         return $this->operatingSystem;
     }
 
-    /**
-     * @return ISoftware
-     */
-    public function getSoftware()
+    public function setOperatingSystem(?OperatingSystem $operatingSystem): self
     {
-        return $this->software;
+        $this->operatingSystem = $operatingSystem;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users[] = $user;
+            $user->addUua($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->users->contains($user)) {
+            $this->users->removeElement($user);
+            $user->removeUua($this);
+        }
+
+        return $this;
     }
 }

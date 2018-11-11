@@ -8,7 +8,6 @@
 
 namespace App\Model;
 
-use App\Entity\UUA;
 use App\Interfaces\IUser;
 use App\Interfaces\IUserAgent;
 use App\Interfaces\IUUserAgent;
@@ -23,20 +22,13 @@ class UUserAgentResponseModel
 {
     /**
      * UUserAgentResponseModel constructor.
-     * @param IUUserAgent $userAgent
+     * @param IUser $userAgent
      */
-    public function __construct(IUUserAgent $userAgent)
+    public function __construct(IUser $userAgent)
     {
-        $this->id = $userAgent->getId();
-        $this->agent = $userAgent->getUserAgent();
-        $this->user = $userAgent->getUser();
+        $this->agent = new UserAgentResponseModel($userAgent->getUua()->toArray()[0]);
+        $this->user = new UserResponseModel($userAgent);
     }
-
-    /**
-     * @var int
-     * @SWG\Property(description="The unique identifier of the user agent by user.")
-     */
-    public $id;
 
     /**
      * @var IUserAgent

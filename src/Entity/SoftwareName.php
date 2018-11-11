@@ -7,9 +7,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="App\Repository\SoftwareExtrasRepository")
+ * @ORM\Entity(repositoryClass="App\Repository\SoftwareNameRepository")
  */
-class SoftwareExtras
+class SoftwareName
 {
     /**
      * @ORM\Id()
@@ -19,12 +19,12 @@ class SoftwareExtras
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
-    private $info;
+    private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Software", mappedBy="softwareExtras")
+     * @ORM\OneToMany(targetEntity="App\Entity\Software", mappedBy="softwareName")
      */
     private $softwares;
 
@@ -38,14 +38,14 @@ class SoftwareExtras
         return $this->id;
     }
 
-    public function getInfo(): ?string
+    public function getName(): ?string
     {
-        return $this->info;
+        return $this->name;
     }
 
-    public function setInfo(?string $info): self
+    public function setName(string $name): self
     {
-        $this->info = $info;
+        $this->name = $name;
 
         return $this;
     }
@@ -62,7 +62,7 @@ class SoftwareExtras
     {
         if (!$this->softwares->contains($software)) {
             $this->softwares[] = $software;
-            $software->setSoftwareExtras($this);
+            $software->setSoftwareName($this);
         }
 
         return $this;
@@ -73,8 +73,8 @@ class SoftwareExtras
         if ($this->softwares->contains($software)) {
             $this->softwares->removeElement($software);
             // set the owning side to null (unless already changed)
-            if ($software->getSoftwareExtras() === $this) {
-                $software->setSoftwareExtras(null);
+            if ($software->getSoftwareName() === $this) {
+                $software->setSoftwareName(null);
             }
         }
 

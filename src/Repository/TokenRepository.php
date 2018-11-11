@@ -20,15 +20,15 @@ class TokenRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Session[] Returns an array of Session objects
+//     * @return Token[] Returns an array of Token objects
 //     */
     /*
     public function findByExampleField($value)
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.exampleField = :val')
             ->setParameter('val', $value)
-            ->orderBy('s.id', 'ASC')
+            ->orderBy('t.id', 'ASC')
             ->setMaxResults(10)
             ->getQuery()
             ->getResult()
@@ -37,10 +37,10 @@ class TokenRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Session
+    public function findOneBySomeField($value): ?Token
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.exampleField = :val')
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.exampleField = :val')
             ->setParameter('val', $value)
             ->getQuery()
             ->getOneOrNullResult()

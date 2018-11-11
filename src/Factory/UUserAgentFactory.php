@@ -8,13 +8,14 @@
 
 namespace App\Factory;
 
+use App\Interfaces\IUser;
 use App\Interfaces\IUUserAgent;
 use App\Model\UUserAgentResponseModel;
 
 class UUserAgentFactory extends AbstractResponseModel
 {
     /**
-     * @param IUUserAgent $entity
+     * @param IUser $entity
      * @return UUserAgentResponseModel
      */
     protected function fetch($entity)

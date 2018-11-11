@@ -18,20 +18,13 @@ class UProxyResponseModel
 {
     /**
      * UProxyResponseModel constructor.
-     * @param IUProxy $userProxy
+     * @param IUser $userProxy
      */
-    public function __construct(IUProxy $userProxy)
+    public function __construct(IUser $userProxy)
     {
-        $this->id = $userProxy->getId();
-        $this->proxy = $userProxy->getProxy();
-        $this->user = $userProxy->getUser();
+        $this->proxy = $userProxy->getUp();
+        $this->user = new UserResponseModel($userProxy);
     }
-
-    /**
-     * @var int
-     * @SWG\Property(description="The unique identifier of the proxy.", type="integer", maxLength=255)
-     */
-    public $id;
 
     /**
      * @var IProxy

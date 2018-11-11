@@ -2,12 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Rank;
 use App\Entity\User;
 use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
 use App\Interfaces\IUser;
 use App\Interfaces\IUserService;
 use App\Model\UserResponseModel;
+use App\Response\QueryNotExistResponse;
+use App\Response\RegisterFailedResponse;
+use App\Response\RegisterSuccessResponse;
+use App\Response\TokenRefreshFailedResponse;
 use App\Response\UserLoginFailedResponse;
 use App\Response\UserLoginSuccessResponse;
 use App\Service\TokenService;
@@ -24,6 +29,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class AuthController extends Controller
 {
@@ -41,14 +47,14 @@ class AuthController extends Controller
      * )
      * @SWG\Parameter(
      *     name="username",
-     *     in="query",
+     *     in="header",
      *     type="string",
      *     description="The username from the user.",
      *     required=true
      * )
      * @SWG\Parameter(
      *     name="password",
-     *     in="query",
+     *     in="header",
      *     type="string",
      *     description="The password from the user.",
      *     required=true
@@ -143,12 +149,93 @@ class AuthController extends Controller
      *     required=true
      * )
      * @SWG\Tag(name="auth")
+     *
+     * @param Request $request
+     * @param IResponseService $responseService
+     * @param ValidatorInterface $validator
+     * @return JsonResponse
      */
-    public function registerAction()
+    public function registerAction(Request $request, IResponseService $responseService, ValidatorInterface $validator)
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
-        ]);
+        $entityManager = $this->getDoctrine()->getManager();
+
+        $username = $request->request->get("username");
+        $plainPassword = $request->request->get("password");
+        $email = $request->request->get("email");
+
+        if (empty($username) || empty($plainPassword) || empty($email)) {
+            return $responseService->getJsonResponse(RegisterFailedResponse::class);
+        }
+
+        $user = new User();
+        $user->setUsername($username);
+        $user->setPlainPassword($plainPassword);
+        $user->setPassword(password_hash($user->getPlainPassword(), PASSWORD_BCRYPT, ['cost' => 12]));
+        $user->setEmail($email);
+        $user->setRegisterDate(new \DateTime());
+
+        /** @var Rank $rank */
+        $rank = $entityManager->getRepository(Rank::class)->findOneBy(['name' => 'ROLE_FREE_USER']);
+
+        // check if query exists
+        if ($rank == null) {
+            return $responseService->getJsonResponse(QueryNotExistResponse::class);
+        }
+
+        $user->setRank($rank);
+
+        // catch errors
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $errorString = (string)$errors;
+
+            return $responseService->getJsonResponse(RegisterFailedResponse::class, [ 'error' => $errorString ]);
+        }
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return $responseService->getJsonResponse(RegisterSuccessResponse::class);
+    }
+
+    /**
+     * Refresh an expired token from a user.
+     *
+     * @Route("/api/refresh", methods={"POST"}, name="refresh")
+     * @SWG\Response(
+     *     response=200,
+     *     description="The token refreshed successfully.",
+     * )
+     * @SWG\Response(
+     *     response=403,
+     *     description="The token refresh failed.",
+     * )
+     * @SWG\Parameter(
+     *     name="expiredToken",
+     *     in="query",
+     *     type="string",
+     *     description="The expired token from the user.",
+     *     required=true
+     * )
+     * @SWG\Tag(name="auth")
+     *
+     * @param Request $request
+     * @param IResponseService $responseService
+     * @param IUserService $userService
+     * @param ITokenService $tokenService
+     * @return JsonResponse
+     */
+    public function refreshTokenAction(Request $request, IResponseService $responseService, IUserService $userService, ITokenService $tokenService)
+    {
+        $expiredToken = $request->request->get("expiredToken");
+
+        if (empty($expiredToken)) {
+            return $responseService->getJsonResponse(TokenRefreshFailedResponse::class);
+        }
+
+        $response = $tokenService->refreshToken($expiredToken, $userService);
+
+        return $response;
     }
 }

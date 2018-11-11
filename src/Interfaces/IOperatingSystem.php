@@ -8,6 +8,8 @@
 
 namespace App\Interfaces;
 
+use App\Entity\OperatingSystemName;
+
 /**
  * Interface IOperatingSystem
  * @package App\Interfaces
@@ -20,9 +22,9 @@ interface IOperatingSystem
     public function getId(): ?int;
 
     /**
-     * @return null|string
+     * @return null|OperatingSystemName
      */
-    public function getName(): ?string;
+    public function getOperatingSystemName(): ?OperatingSystemName;
 
     /**
      * @return null|string
