@@ -13,6 +13,14 @@ use App\Interfaces\ITokenService;
 use App\Model\UserResponseModel;
 use App\Model\UUserAgentResponseModel;
 use App\Model\UProxyResponseModel;
+use App\Response\ProxyExistsResponse;
+use App\Response\ProxyFailedResponse;
+use App\Response\ProxySuccessResponse;
+use App\Response\QueryFetchedSuccessResponse;
+use App\Response\QueryNotExistResponse;
+use App\Response\UserAgentExistsResponse;
+use App\Response\UserAgentFailedResponse;
+use App\Response\UserAgentSuccessResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,7 +52,7 @@ class UserController extends Controller
             $data = $this->getDoctrine()->getRepository(User::class)->findAll();
             $result = $collectionService->getCollection(UserFactory::class, $data);
 
-            return $tokenService->getTokenResponse($request, $result);
+            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
         }
 
         return $tokenService->getTokenResponse($request);
@@ -74,7 +82,7 @@ class UserController extends Controller
             $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
             $result = $collectionService->getCollection(UUserAgentFactory::class, $data);
 
-            return $tokenService->getTokenResponse($request, $result);
+            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
         }
 
         return $tokenService->getTokenResponse($request);
@@ -119,15 +127,15 @@ class UserController extends Controller
                         $entityManager->persist($userResult);
                         $entityManager->flush();
 
-                        return $tokenService->getTokenResponse($request, ['response' => 'User agent inserted successfully.']);
+                        return $tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
                     } else {
-                        return $tokenService->getTokenResponse($request, ['response' => 'User agent already exists.']);
+                        return $tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
                     }
                 } else {
-                    return $tokenService->getTokenResponse($request, ['response' => 'User or user agent dousn`t exist.']);
+                    return $tokenService->getTokenResponse($request, QueryNotExistResponse::class);
                 }
             } else {
-                return $tokenService->getTokenResponse($request, ['response' => 'User agent information incomplete. Check your credentials.']);
+                return $tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
             }
         }
 
@@ -158,7 +166,7 @@ class UserController extends Controller
             $data = $this->getDoctrine()->getRepository(User::class)->findBy(['username' => $tokenService->getPayload($request)['username']]);
             $result = $collectionService->getCollection(UProxyFactory::class, $data);
 
-            return $tokenService->getTokenResponse($request, $result);
+            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
         }
 
         return $tokenService->getTokenResponse($request);
@@ -203,13 +211,13 @@ class UserController extends Controller
                         $entityManager->persist($userResult);
                         $entityManager->flush();
 
-                        return $tokenService->getTokenResponse($request, ['response' => 'Proxy inserted successfully.']);
+                        return $tokenService->getTokenResponse($request, ProxySuccessResponse::class);
                     } else {
-                        return $tokenService->getTokenResponse($request, ['response' => 'Proxy already exists.']);
+                        return $tokenService->getTokenResponse($request, ProxyExistsResponse::class);
                     }
                 }
             } else {
-                return $tokenService->getTokenResponse($request, ['response' => 'Proxy information incomplete. Check your credentials.']);
+                return $tokenService->getTokenResponse($request, ProxyFailedResponse::class);
             }
         }
 

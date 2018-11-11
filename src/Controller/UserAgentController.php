@@ -20,6 +20,9 @@ use App\Factory\UUserAgentFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\ITokenService;
 use App\Model\UserAgentResponseModel;
+use App\Response\UserAgentExistsResponse;
+use App\Response\UserAgentFailedResponse;
+use App\Response\UserAgentSuccessResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -186,12 +189,12 @@ class UserAgentController extends Controller
                     // push to database
                     $entityManager->flush();
 
-                    return $tokenService->getTokenResponse($request, ['response' => 'User agent inserted successfully.']);
+                    return $tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
                 } else {
-                    return $tokenService->getTokenResponse($request, ['response' => 'User agent already exists.']);
+                    return $tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
                 }
             } else {
-                return $tokenService->getTokenResponse($request, ['response' => 'User agent information incomplete. Check your credentials.']);
+                return $tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
             }
         }
 

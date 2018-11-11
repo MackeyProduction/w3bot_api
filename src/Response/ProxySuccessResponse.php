@@ -17,6 +17,6 @@ class ProxySuccessResponse extends AbstractResponse
 
     public function fetch(string $jsonResponse, array $data = [])
     {
-        return $this->jsonResponse::create(['response' => 'Proxy inserted successfully.'], $this->jsonResponse::HTTP_OK);
+        return $this->jsonResponse::create(['response' => 'Proxy inserted successfully.'] + $data, $this->jsonResponse::HTTP_OK);
     }
 }

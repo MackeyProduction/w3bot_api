@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Proxy;
-use App\Entity\UP;
 use App\Factory\ProxyFactory;
 use App\Factory\UProxyFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\ITokenService;
 use App\Model\ProxyResponseModel;
+use App\Response\ProxyExistsResponse;
+use App\Response\ProxyFailedResponse;
+use App\Response\ProxySuccessResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -73,10 +75,45 @@ class ProxyController extends AbstractController
      * @SWG\Tag(name="proxy")
      * @Security(name="Bearer")
      *
+     * @param Request $request
+     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postProxy()
+    public function postProxy(Request $request, ITokenService $tokenService)
     {
-        return $this->json("");
+        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        {
+            $entityManager = $this->getDoctrine()->getManager();
+
+            $ip = $request->request->get("ip");
+            $port = $request->request->get("port");
+            $name = $request->request->get("name");
+            $username = $request->request->get("username");
+            $password = $request->request->get("password");
+
+            if ($ip != "" && $port != "" && $name != "") {
+                $proxyResult = $this->getDoctrine()->getRepository(Proxy::class)->findOneBy(['name' => $name]);
+
+                if ($proxyResult == null) {
+                    $proxyEntity = new Proxy();
+                    $proxyEntity->setIp($ip);
+                    $proxyEntity->setPort($port);
+                    $proxyEntity->setName($name);
+                    $proxyEntity->setUsername($username);
+                    $proxyEntity->setPassword($password);
+
+                    $entityManager->persist($proxyEntity);
+                    $entityManager->flush();
+
+                    return $tokenService->getTokenResponse($request, ProxySuccessResponse::class);
+                } else {
+                    return $tokenService->getTokenResponse($request, ProxyExistsResponse::class);
+                }
+            } else {
+                return $tokenService->getTokenResponse($request, ProxyFailedResponse::class);
+            }
+        }
+
+        return $tokenService->getTokenResponse($request);
     }
 }

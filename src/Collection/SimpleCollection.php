@@ -8,7 +8,8 @@
 
 namespace App\Collection;
 
-use App\Adapter\ArrayAdapter;
+use Pagerfanta\Adapter\ArrayAdapter;
+use Pagerfanta\Pagerfanta;
 
 /**
  * Class SimpleCollection
@@ -51,7 +52,7 @@ class SimpleCollection
     public function getCollection()
     {
         return [
-            'count' => $this->adapter->count(),
+            'count' => $this->adapter->getNbResults(),
             'items' => $this->adapter->getArray()
         ];
     }

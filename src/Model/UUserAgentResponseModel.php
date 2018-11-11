@@ -26,7 +26,7 @@ class UUserAgentResponseModel
      */
     public function __construct(IUser $userAgent)
     {
-        $this->agent = $userAgent->getUua()->toArray();
+        $this->agent = new UserAgentResponseModel($userAgent->getUua()->toArray()[0]);
         $this->user = new UserResponseModel($userAgent);
     }
 

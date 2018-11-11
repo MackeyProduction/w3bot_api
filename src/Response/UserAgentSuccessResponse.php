@@ -17,6 +17,6 @@ class UserAgentSuccessResponse extends AbstractResponse
 
     public function fetch(string $jsonResponse, array $data = [])
     {
-        $this->jsonResponse::create(['response' => 'User agent inserted successfully.'], $this->jsonResponse::HTTP_OK);
+        return $this->jsonResponse::create(['response' => 'User agent inserted successfully.'] + $data, $this->jsonResponse::HTTP_OK);
     }
 }
