@@ -22,16 +22,16 @@ class UUserAgentResponseModel
 {
     /**
      * UUserAgentResponseModel constructor.
-     * @param IUser $userAgent
+     * @param IUser $user
      */
-    public function __construct(IUser $userAgent)
+    public function __construct(IUser $user)
     {
-        $this->agent = UserAgentResponseModel::create($userAgent->getUua()->toArray()[0]);
-        $this->user = UserResponseModel::create($userAgent);
+        $this->agent = null;
+        $this->user = UserResponseModel::create($user);
     }
 
     /**
-     * @var IUserAgent
+     * @var IUserAgent[]
      */
     public $agent;
 

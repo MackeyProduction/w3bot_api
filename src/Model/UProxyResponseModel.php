@@ -22,12 +22,12 @@ class UProxyResponseModel
      */
     public function __construct(IUser $userProxy)
     {
-        $this->proxy = $userProxy->getUp();
+        $this->proxy = null;
         $this->user = UserResponseModel::create($userProxy);
     }
 
     /**
-     * @var IProxy
+     * @var IProxy[]
      */
     public $proxy;
 
