@@ -25,7 +25,7 @@ class ProxyResponseModel
     public function __construct(IProxy $proxy)
     {
         $this->id = $proxy->getId();
-        $this->name = $proxy->getUsername();
+        $this->name = $proxy->getName();
         $this->ip = $proxy->getIP();
         $this->port = $proxy->getPort();
         $this->username = $proxy->getUsername();
@@ -40,13 +40,13 @@ class ProxyResponseModel
 
     /**
      * @var string
-     * @SWG\Property(description="The name of the proxy.")
+     * @SWG\Property(type="string", maxLength=255, description="The name of the proxy.")
      */
     public $name;
 
     /**
      * @var string
-     * @SWG\Property(description="The ip address of the proxy.")
+     * @SWG\Property(type="string", maxLength=255, description="The ip address of the proxy.")
      */
     public $ip;
 
@@ -58,13 +58,13 @@ class ProxyResponseModel
 
     /**
      * @var string
-     * @SWG\Property(description="The username of the proxy.")
+     * @SWG\Property(type="string", maxLength=255, description="The username of the proxy.")
      */
     public $username;
 
     /**
      * @var string
-     * @SWG\Property(description="The password of the proxy.")
+     * @SWG\Property(type="string", maxLength=255, description="The password of the proxy.")
      */
     public $password;
 }

@@ -27,8 +27,17 @@ class UserAgentResponseModel
     public function __construct(IUserAgent $userAgent)
     {
         $this->id = $userAgent->getId();
-        $this->operatingSystem = $userAgent->getOperatingSystem();
-        $this->software = $userAgent->getSoftware();
+        $this->operatingSystem = OperatingSystemResponseModel::create($userAgent->getOperatingSystem());
+        $this->software = SoftwareResponseModel::create($userAgent->getSoftware());
+    }
+
+    /**
+     * @param IUserAgent $userAgent
+     * @return static
+     */
+    public static function create(IUserAgent $userAgent)
+    {
+        return new static($userAgent);
     }
 
     /**
@@ -39,13 +48,11 @@ class UserAgentResponseModel
 
     /**
      * @var IOperatingSystem
-     * @SWG\Property(description="The operating system of the user agent.")
      */
     public $operatingSystem;
 
     /**
      * @var ISoftware
-     * @SWG\Property(description="The software of the user agent.")
      */
     public $software;
 }

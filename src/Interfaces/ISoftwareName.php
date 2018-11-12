@@ -2,17 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: Til Anheier
- * Date: 26.10.2018
- * Time: 21:46
+ * Date: 12.11.2018
+ * Time: 16:40
  */
 
 namespace App\Interfaces;
 
 /**
- * Interface IGroup
+ * Interface ISoftwareName
  * @package App\Interfaces
  */
-interface IGroup
+interface ISoftwareName
 {
     /**
      * @return int|null
