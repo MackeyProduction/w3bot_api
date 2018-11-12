@@ -2,7 +2,8 @@
 namespace App\Model;
 
 use App\Entity\User;
-use App\Interfaces\IGroup;
+use App\Interfaces\IRank;
+use App\Model\RankResponseModel;
 use App\Interfaces\IUser;
 use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -22,16 +23,26 @@ use Swagger\Annotations as SWG;
  */
 class UserResponseModel
 {
-    private $user;
-
+    /**
+     * UserResponseModel constructor.
+     * @param IUser $user
+     */
     public function __construct(IUser $user)
     {
-        $this->user = $user;
-
         $this->id = $user->getId();
         $this->username = $user->getUsername();
         $this->email = $user->getEmail();
         $this->registerDate = $user->getRegisterDate();
+        $this->rank = RankResponseModel::create($user->getRank());
+    }
+
+    /**
+     * @param IUser $user
+     * @return static
+     */
+    public static function create(IUser $user)
+    {
+        return new static($user);
     }
 
     /**
@@ -42,29 +53,24 @@ class UserResponseModel
 
     /**
      * @var string
-     * @SWG\Property(description="The username from the user.", type="string", maxLength=255)
+     * @SWG\Property(type="string", maxLength=255, description="The username from the user.")
      */
     public $username;
 
     /**
      * @var string
-     * @SWG\Property(description="The email address from the user.", type="string", maxLength=255)
+     * @SWG\Property(type="string", maxLength=255, description="The email address from the user.")
      */
     public $email;
 
     /**
      * @var \DateTime
-     * @SWG\Property(description="The register date from the user.", type="DateTime", maxLength=255)
+     * @SWG\Property(type="DateTime", maxLength=255, description="The register date from the user.")
      */
     public $registerDate;
 
     /**
-     * @var Role[]
+     * @var IRank
      */
-    public $roles;
-
-    /**
-     * @var IGroup
-     */
-    public $group;
+    public $rank;
 }

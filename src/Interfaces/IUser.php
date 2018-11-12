@@ -8,6 +8,7 @@
 namespace App\Interfaces;
 
 use App\Entity\Proxy;
+use App\Entity\Rank;
 use App\Entity\UserAgent;
 use Doctrine\Common\Collections\Collection;
 use \Symfony\Component\Security\Core\User\UserInterface;
@@ -47,6 +48,11 @@ interface IUser
      * @return null|\DateTime
      */
     public function getRegisterDate(): ?\DateTime;
+
+    /**
+     * @return Rank|null
+     */
+    public function getRank(): ?Rank;
 
     /**
      * @return Collection|UserAgent[]
