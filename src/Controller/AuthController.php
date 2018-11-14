@@ -9,6 +9,8 @@ use App\Interfaces\ITokenService;
 use App\Interfaces\IUser;
 use App\Interfaces\IUserService;
 use App\Model\UserResponseModel;
+use App\Response\ForgotPasswordFailedResponse;
+use App\Response\ForgotPasswordSuccessResponse;
 use App\Response\QueryNotExistResponse;
 use App\Response\RegisterFailedResponse;
 use App\Response\RegisterSuccessResponse;
@@ -237,5 +239,56 @@ class AuthController extends Controller
         $response = $tokenService->refreshToken($expiredToken, $userService);
 
         return $response;
+    }
+
+    /**
+     * Refresh an expired token from a user.
+     *
+     * @Route("/api/forgot", methods={"POST"}, name="refresh")
+     * @SWG\Response(
+     *     response=200,
+     *     description="The token refreshed successfully.",
+     * )
+     * @SWG\Response(
+     *     response=403,
+     *     description="The token refresh failed.",
+     * )
+     * @SWG\Parameter(
+     *     name="email",
+     *     in="query",
+     *     type="string",
+     *     description="The email address of the user.",
+     *     required=true
+     * )
+     * @SWG\Tag(name="auth")
+     *
+     * @param Request $request
+     * @param IResponseService $responseService
+     * @param IUserService $userService
+     * @param ITokenService $tokenService
+     * @return JsonResponse
+     */
+    public function forgotPasswordAction(Request $request, IResponseService $responseService, IUserService $userService, ITokenService $tokenService)
+    {
+        $email = $request->request->get("email");
+
+        if (empty($email)) {
+            return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+        }
+
+        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
+
+        if ($user != null) {
+            return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+        }
+
+        /** @var IUser $user*/
+        $response = $userService->recoverPassword($user);
+
+        if (!$response) {
+            return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+        }
+
+        return $responseService->getJsonResponse(ForgotPasswordSuccessResponse::class);
     }
 }

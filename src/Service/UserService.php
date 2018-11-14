@@ -62,6 +62,32 @@ class UserService implements IUserService
     }
 
     /**
+     * @param IUser $user
+     * @return bool
+     */
+    public function recoverPassword(IUser $user)
+    {
+        /** @var $user User */
+        if ($user != null) {
+            $username = $user->getUsername();
+            $url = "";
+            $text = "Dear ${$username},\n\n
+                we got your request for recovering your password.\n
+                Please visit the website to recover your password.\n
+                \n{$url}
+                \n\nYours sincerely,\n
+                w3bot";
+            $emailSend = mail($user->getEmail(), "Password recovering", $text);
+
+            if ($emailSend) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Maps the IUser interface on UserInterface.
      * @param IUser $user
      * @return UserAdapter

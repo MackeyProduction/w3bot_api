@@ -28,4 +28,10 @@ interface IUserService
      * @return UserAdapter
      */
     public function mapUserCredentials(IUser $user);
+
+    /**
+     * @param IUser $user
+     * @return boolean
+     */
+    public function recoverPassword(IUser $user);
 }
