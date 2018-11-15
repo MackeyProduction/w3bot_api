@@ -31,7 +31,8 @@ interface IUserService
 
     /**
      * @param IUser $user
-     * @return boolean
+     * @param \Swift_Mailer $mailer
+     * @return bool
      */
-    public function recoverPassword(IUser $user);
+    public function recoverPassword(IUser $user, \Swift_Mailer $mailer);
 }

@@ -16,6 +16,7 @@ use App\Interfaces\IUserService;
 use App\Response\UserLoginFailedResponse;
 use App\Response\UserLoginSuccessResponse;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -63,21 +64,27 @@ class UserService implements IUserService
 
     /**
      * @param IUser $user
+     * @param \Swift_Mailer $mailer
      * @return bool
      */
-    public function recoverPassword(IUser $user)
+    public function recoverPassword(IUser $user, \Swift_Mailer $mailer)
     {
         /** @var $user User */
         if ($user != null) {
             $username = $user->getUsername();
-            $url = "";
-            $text = "Dear ${$username},\n\n
-                we got your request for recovering your password.\n
-                Please visit the website to recover your password.\n
+            $url = "https://w3bot.org/recover/" . bin2hex(openssl_random_pseudo_bytes(20));
+            $text = "Hi ${username},\n
+                You recently requested to reset your password. Use the link below to reset it. This password reset is only valid for the next 24 hours.
                 \n{$url}
-                \n\nYours sincerely,\n
-                w3bot";
-            $emailSend = mail($user->getEmail(), "Password recovering", $text);
+                \nIf you did not request a password reset, please ignore this email or contact support if you have questions.
+                \n\nThanks,\n
+                Your w3bot Team";
+            $message = (new \Swift_Message("Password recovery"))
+                ->setFrom("support@w3bot.org")
+                ->setTo($user->getEmail())
+                ->setBody($text);
+
+            $emailSend = $mailer->send($message);
 
             if ($emailSend) {
                 return true;

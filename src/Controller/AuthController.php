@@ -242,16 +242,16 @@ class AuthController extends Controller
     }
 
     /**
-     * Refresh an expired token from a user.
+     * Password recovery for a user.
      *
      * @Route("/api/forgot", methods={"POST"}, name="refresh")
      * @SWG\Response(
      *     response=200,
-     *     description="The token refreshed successfully.",
+     *     description="The password recovery was successful.",
      * )
      * @SWG\Response(
      *     response=403,
-     *     description="The token refresh failed.",
+     *     description="The password recovery failed.",
      * )
      * @SWG\Parameter(
      *     name="email",
@@ -265,30 +265,32 @@ class AuthController extends Controller
      * @param Request $request
      * @param IResponseService $responseService
      * @param IUserService $userService
-     * @param ITokenService $tokenService
+     * @param \Swift_Mailer $mailer
      * @return JsonResponse
      */
-    public function forgotPasswordAction(Request $request, IResponseService $responseService, IUserService $userService, ITokenService $tokenService)
+    public function forgotPasswordAction(Request $request, IResponseService $responseService, IUserService $userService, \Swift_Mailer $mailer)
     {
         $email = $request->request->get("email");
 
-        if (empty($email)) {
-            return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+        if (!empty($email)) {
+            $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
+
+            // check if user exists
+            if ($user == null) {
+                return $responseService->getJsonResponse(QueryNotExistResponse::class);
+            }
+
+            /** @var IUser $user*/
+            $response = $userService->recoverPassword($user, $mailer);
+
+            // email send successfully?
+            if (!$response) {
+                return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+            }
+
+            return $responseService->getJsonResponse(ForgotPasswordSuccessResponse::class);
         }
 
-        $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
-
-        if ($user != null) {
-            return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
-        }
-
-        /** @var IUser $user*/
-        $response = $userService->recoverPassword($user);
-
-        if (!$response) {
-            return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
-        }
-
-        return $responseService->getJsonResponse(ForgotPasswordSuccessResponse::class);
+        return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
     }
 }
