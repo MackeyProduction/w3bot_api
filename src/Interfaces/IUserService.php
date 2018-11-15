@@ -28,4 +28,11 @@ interface IUserService
      * @return UserAdapter
      */
     public function mapUserCredentials(IUser $user);
+
+    /**
+     * @param IUser $user
+     * @param \Swift_Mailer $mailer
+     * @return bool
+     */
+    public function recoverPassword(IUser $user, \Swift_Mailer $mailer);
 }

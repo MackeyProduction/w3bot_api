@@ -53,14 +53,4 @@ interface IUser
      * @return Rank|null
      */
     public function getRank(): ?Rank;
-
-    /**
-     * @return Collection|UserAgent[]
-     */
-    public function getUua(): Collection;
-
-    /**
-     * @return Collection|Proxy[]
-     */
-    public function getUp(): Collection;
 }

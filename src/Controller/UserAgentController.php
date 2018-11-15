@@ -19,6 +19,7 @@ use App\Factory\UserAgentFactory;
 use App\Factory\UUserAgentFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\ITokenService;
+use App\Interfaces\IUserAgent;
 use App\Model\UserAgentResponseModel;
 use App\Response\UserAgentExistsResponse;
 use App\Response\UserAgentFailedResponse;
@@ -67,13 +68,13 @@ class UserAgentController extends Controller
      *
      * @param $id
      * @return \Symfony\Component\HttpFoundation\JsonResponse
-     * @internal param ICollectionService $collectionService
      */
     public function fetchUserAgentById($id)
     {
-        $data = UserAgentFactory::create($this->getDoctrine()->getRepository(UserAgent::class)->findBy(['id' => $id]))->getResponse();
+        $data = $this->getDoctrine()->getRepository(UserAgent::class)->find($id);
 
-        return $this->json($data);
+        /** @var IUserAgent $data */
+        return $this->json(UserAgentResponseModel::create($data));
     }
 
     /**
