@@ -4,22 +4,8 @@
     <bookmark url="file://$PROJECT_DIR$/src/Controller/UserController.php" line="121" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="193c2ea9-6bb1-46da-a0a7-d23a62f67d4b" name="Default" comment="- swiftmailer added&#10;-">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/packages/dev/swiftmailer.yaml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/packages/swiftmailer.yaml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/config/packages/test/swiftmailer.yaml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/Model/UProxyResponseModel.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/Model/UUserAgentResponseModel.php" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.env.dist" afterPath="$PROJECT_DIR$/.env.dist" />
+    <list default="true" id="193c2ea9-6bb1-46da-a0a7-d23a62f67d4b" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/composer.json" afterPath="$PROJECT_DIR$/composer.json" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/composer.lock" afterPath="$PROJECT_DIR$/composer.lock" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/config/bundles.php" afterPath="$PROJECT_DIR$/config/bundles.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Controller/AuthController.php" afterPath="$PROJECT_DIR$/src/Controller/AuthController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Controller/UserController.php" afterPath="$PROJECT_DIR$/src/Controller/UserController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Interfaces/IUserService.php" afterPath="$PROJECT_DIR$/src/Interfaces/IUserService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Service/UserService.php" afterPath="$PROJECT_DIR$/src/Service/UserService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/symfony.lock" afterPath="$PROJECT_DIR$/symfony.lock" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -393,7 +379,7 @@
       <workItem from="1541933266900" duration="27836000" />
       <workItem from="1542009064422" duration="15128000" />
       <workItem from="1542187506697" duration="12681000" />
-      <workItem from="1542267884875" duration="5583000" />
+      <workItem from="1542267884875" duration="6182000" />
     </task>
     <task id="LOCAL-00001" summary="- entities added&#10;- endpoints added&#10;- login added">
       <created>1540159807789</created>
@@ -500,15 +486,21 @@
       <option name="project" value="LOCAL" />
       <updated>1542062633045</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="- swiftmailer added&#10;- forgot password function modified&#10;- bug fix in fetching user agents and proxies">
+      <created>1542323798836</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1542323798836</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="238189000" />
+    <option name="totallyTimeSpent" value="238788000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1912" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13958333" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -552,7 +544,8 @@
     <MESSAGE value="- response classes in controllers added&#10;- proxy posting&#10;- register and refresh token added&#10;- responses added&#10;&#10;TODO:&#10;- fix response of response models&#10;- fix model output on doc page" />
     <MESSAGE value="- new response models added&#10;- new interfaces added&#10;- interfaces in entities integrated" />
     <MESSAGE value="- model bug fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="- model bug fix" />
+    <MESSAGE value="- swiftmailer added&#10;- forgot password function modified&#10;- bug fix in fetching user agents and proxies" />
+    <option name="LAST_COMMIT_MESSAGE" value="- swiftmailer added&#10;- forgot password function modified&#10;- bug fix in fetching user agents and proxies" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -880,6 +873,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -887,6 +881,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -894,6 +889,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
