@@ -244,7 +244,7 @@ class AuthController extends Controller
     /**
      * Password recovery for a user.
      *
-     * @Route("/api/forgot", methods={"POST"}, name="refresh")
+     * @Route("/api/forgot", methods={"POST"}, name="forgot")
      * @SWG\Response(
      *     response=200,
      *     description="The password recovery was successful.",

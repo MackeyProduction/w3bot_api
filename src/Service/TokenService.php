@@ -118,8 +118,8 @@ class TokenService extends BaseAuthenticator implements ITokenService
             if ($request->headers->get("Authorization")) {
                 return $this->responseService->getJsonResponse($responseType, [
                     'token' => $this->getCredentials($request),
-                    'payload' => $this->getPayload($request) + $data,
-                ]);
+                    'payload' => $this->getPayload($request)
+                ] + $data);
             }
         } catch (ExpiredTokenException $exception) {
             return JsonResponse::create(['response' => 'The current token is expired. Please refresh your token.'], JsonResponse::HTTP_FORBIDDEN);
