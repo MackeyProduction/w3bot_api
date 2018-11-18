@@ -33,6 +33,15 @@ class ProxyResponseModel
     }
 
     /**
+     * @param IProxy $proxy
+     * @return static
+     */
+    public static function create(IProxy $proxy)
+    {
+        return new static($proxy);
+    }
+
+    /**
      * @var int
      * @SWG\Property(description="The unique identifier of the proxy.")
      */

@@ -5,13 +5,13 @@ namespace App\Controller;
 use App\Entity\Proxy;
 use App\Entity\User;
 use App\Entity\UserAgent;
-use App\Factory\UProxyFactory;
 use App\Factory\UserAgentFactory;
-use App\Factory\UUserAgentFactory;
 use App\Factory\UserFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\ITokenService;
 use App\Model\UserResponseModel;
+use App\Model\UserAgentResponseModel;
+use App\Model\ProxyResponseModel;
 use App\Response\ProxyExistsResponse;
 use App\Response\ProxyFailedResponse;
 use App\Response\ProxySuccessResponse;
@@ -20,7 +20,7 @@ use App\Response\QueryNotExistResponse;
 use App\Response\UserAgentExistsResponse;
 use App\Response\UserAgentFailedResponse;
 use App\Response\UserAgentSuccessResponse;
-use Doctrine\ORM\Proxy\ProxyFactory;
+use App\Factory\ProxyFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -96,7 +96,7 @@ class UserController extends Controller
      * @SWG\Response(
      *     response=200,
      *     description="Returns true when insert was successful.",
-     *     @Model(type=UUserAgentResponseModel::class, groups={"full"})
+     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
      * )
      * @SWG\Tag(name="user")
      * @Security(name="Bearer")
@@ -181,7 +181,7 @@ class UserController extends Controller
      * @SWG\Response(
      *     response=200,
      *     description="Returns true when insert was successful.",
-     *     @Model(type=UProxyResponseModel::class, groups={"full"})
+     *     @Model(type=ProxyResponseModel::class, groups={"full"})
      * )
      * @SWG\Tag(name="user")
      * @Security(name="Bearer")

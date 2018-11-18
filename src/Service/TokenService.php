@@ -118,7 +118,8 @@ class TokenService extends BaseAuthenticator implements ITokenService
             if ($request->headers->get("Authorization")) {
                 return $this->responseService->getJsonResponse($responseType, [
                     'token' => $this->getCredentials($request),
-                    'payload' => $this->getPayload($request) + $data,
+                    'payload' => $this->getPayload($request),
+                    'data' => $data
                 ]);
             }
         } catch (ExpiredTokenException $exception) {

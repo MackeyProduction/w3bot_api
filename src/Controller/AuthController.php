@@ -244,7 +244,7 @@ class AuthController extends Controller
     /**
      * Password recovery for a user.
      *
-     * @Route("/api/forgot", methods={"POST"}, name="refresh")
+     * @Route("/api/forgot", methods={"POST"}, name="forgot")
      * @SWG\Response(
      *     response=200,
      *     description="The password recovery was successful.",
@@ -270,10 +270,10 @@ class AuthController extends Controller
      */
     public function forgotPasswordAction(Request $request, IResponseService $responseService, IUserService $userService, \Swift_Mailer $mailer)
     {
-        $email = $request->request->get("email");
+        $username = $request->request->get("username");
 
-        if (!empty($email)) {
-            $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['email' => $email]);
+        if (!empty($username)) {
+            $user = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $username]);
 
             // check if user exists
             if ($user == null) {
