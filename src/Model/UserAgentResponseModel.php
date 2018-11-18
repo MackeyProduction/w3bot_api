@@ -29,6 +29,7 @@ class UserAgentResponseModel
         $this->id = $userAgent->getId();
         $this->operatingSystem = OperatingSystemResponseModel::create($userAgent->getOperatingSystem());
         $this->software = SoftwareResponseModel::create($userAgent->getSoftware());
+        $this->agent = $userAgent->getAgent();
     }
 
     /**
@@ -55,4 +56,10 @@ class UserAgentResponseModel
      * @var ISoftware
      */
     public $software;
+
+    /**
+     * @var string
+     * @SWG\Property(type="string", maxLength=255, description="The agent of the software and operating system.")
+     */
+    public $agent;
 }

@@ -28,4 +28,9 @@ interface IUserAgent
      * @return ISoftware
      */
     public function getSoftware();
+
+    /**
+     * @return null|string
+     */
+    public function getAgent(): ?string;
 }
