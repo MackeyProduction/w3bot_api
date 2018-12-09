@@ -19,6 +19,106 @@ class UserAgentRepository extends ServiceEntityRepository
         parent::__construct($registry, UserAgent::class);
     }
 
+    /**
+     * @param $softwareName
+     * @return \Doctrine\ORM\Query
+     */
+    public function findBySoftwareName($softwareName)
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.software', 's')
+            ->addSelect('s')
+            ->innerJoin('s.softwareName', 'sn')
+            ->addSelect('sn')
+            ->andWhere('sn.name = :softwareName')
+            ->setParameter('softwareName', $softwareName)
+            ->getQuery()
+            ->execute()
+            ;
+    }
+
+    /**
+     * @param $osName
+     * @return \Doctrine\ORM\Query
+     */
+    public function findByOperatingSystemName($osName)
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.operatingSystem', 'o')
+            ->addSelect('o')
+            ->innerJoin('o.operatingSystemName', 'osn')
+            ->addSelect('osn')
+            ->andWhere('osn.name = :operatingSystemName')
+            ->setParameter('operatingSystemName', $osName)
+            ->getQuery()
+            ->execute()
+            ;
+    }
+
+    /**
+     * @return \Doctrine\ORM\Query
+     */
+    public function findByOperatingSystemNameGrouped()
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.operatingSystem', 'o')
+            ->addSelect('o')
+            ->innerJoin('o.operatingSystemName', 'osn')
+            ->addSelect('osn')
+            ->addGroupBy('osn.name')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
+
+    public function findBySoftwareNameAndVersion($softwareName, $version)
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.software', 's')
+            ->addSelect('s')
+            ->innerJoin('s.softwareName', 'sn')
+            ->addSelect('sn')
+            ->andWhere('sn.name = :softwareName')
+            ->andWhere('s.version = :version')
+            ->setParameter('softwareName', $softwareName)
+            ->setParameter('version', $version)
+            ->getQuery()
+            ->execute()
+            ;
+    }
+
+    public function findByLayoutEngineAndVersion($layoutEngineName, $version)
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.software', 's')
+            ->addSelect('s')
+            ->innerJoin('s.layoutEngine', 'le')
+            ->addSelect('le')
+            ->andWhere('le.name = :layoutEngineName')
+            ->andWhere('s.LeVersion = :version')
+            ->setParameter('layoutEngineName', $layoutEngineName)
+            ->setParameter('version', $version)
+            ->getQuery()
+            ->execute()
+            ;
+    }
+
+    public function findByOperatingSystemNameAndVersion($osName, $version)
+    {
+        return $this->createQueryBuilder('ua')
+            ->innerJoin('ua.operatingSystem', 'o')
+            ->addSelect('o')
+            ->innerJoin('o.operatingSystemName', 'osn')
+            ->addSelect('osn')
+            ->andWhere('osn.name = :operatingSystemName')
+            ->andWhere('o.version = :version')
+            ->setParameter('operatingSystemName', $osName)
+            ->setParameter('version', $version)
+            ->getQuery()
+            ->execute()
+            ;
+    }
+
     public function findOneBySoftwareNameAndVersion($softwareName, $version): ?UserAgent
     {
         return $this->createQueryBuilder('ua')

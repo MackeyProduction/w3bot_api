@@ -37,6 +37,12 @@ class UserController extends Controller
      *     description="Returns a list of proxies filtered by user.",
      *     @Model(type=UserResponseModel::class, groups={"non-sensitive-data"})
      * )
+     * @SWG\Parameter(
+     *     name="name",
+     *     in="query",
+     *     type="string",
+     *     description="The field used for username."
+     * )
      * @SWG\Tag(name="user")
      * @Security(name="Bearer")
      *
@@ -50,6 +56,11 @@ class UserController extends Controller
         if ($tokenService->getTokenResponse($request)->isSuccessful())
         {
             $data = $this->getDoctrine()->getRepository(User::class)->findAll();
+
+            if (!empty($request->query->get("name"))) {
+                $data = $this->getDoctrine()->getRepository(User::class)->findBy([ 'username' => $request->query->get("name") ]);
+            }
+
             $result = $collectionService->getCollection(UserFactory::class, $data);
 
             return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);

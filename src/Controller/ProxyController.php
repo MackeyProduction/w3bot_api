@@ -57,14 +57,16 @@ class ProxyController extends AbstractController
      * @SWG\Tag(name="proxy")
      *
      * @param $id
+     * @param ICollectionService $collectionService
      * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxyById($id, IResponseService $responseService)
+    public function fetchProxyById($id, ICollectionService $collectionService, IResponseService $responseService)
     {
         $data = ProxyFactory::create($this->getDoctrine()->getRepository(Proxy::class)->findBy(['id' => $id]))->getResponse();
+        $result = $collectionService->getCollection(ProxyFactory::class, $data);
 
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $data ]);
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
