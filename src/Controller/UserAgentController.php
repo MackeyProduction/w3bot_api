@@ -17,9 +17,11 @@ use App\Entity\SoftwareName;
 use App\Entity\UserAgent;
 use App\Factory\UserAgentFactory;
 use App\Interfaces\ICollectionService;
+use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
 use App\Interfaces\IUserAgent;
 use App\Model\UserAgentResponseModel;
+use App\Response\QueryFetchedSuccessResponse;
 use App\Response\UserAgentExistsResponse;
 use App\Response\UserAgentFailedResponse;
 use App\Response\UserAgentSuccessResponse;
@@ -44,14 +46,15 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      *
      * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents(ICollectionService $collectionService)
+    public function fetchUserAgents(ICollectionService $collectionService, IResponseService $responseService)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findAll();
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
-        return $this->json($result);
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -66,14 +69,15 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      *
      * @param $id
+     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentById($id)
+    public function fetchUserAgentById($id, IResponseService $responseService)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->find($id);
 
         /** @var IUserAgent $data */
-        return $this->json(UserAgentResponseModel::create($data));
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => UserAgentResponseModel::create($data) ]);
     }
 
     /**
