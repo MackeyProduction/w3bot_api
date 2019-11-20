@@ -26,6 +26,12 @@ class User implements IUser
     /**
      * @ORM\Column(type="string", length=191, unique=true)
      * @Assert\NotBlank()
+     * @Assert\Length(
+     *     min=3,
+     *     max=50,
+     *     minMessage="Your username must be at least {{ limit }} characters long.",
+     *     maxMessage="Your username cannot be longer than {{ limit }} characters."
+     * )
      */
     private $username;
 
@@ -34,6 +40,15 @@ class User implements IUser
      */
     private $password;
 
+    /**
+     * @var string
+     * @Assert\Length(
+     *     min=6,
+     *     max=50,
+     *     minMessage="Your password must be at least {{ limit }} characters long.",
+     *     maxMessage="Your password cannot be longer than {{ limit }} characters."
+     * )
+     */
     private $plainPassword;
 
     /**

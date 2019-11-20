@@ -6,11 +6,13 @@ use App\Entity\Proxy;
 use App\Factory\ProxyFactory;
 use App\Factory\UProxyFactory;
 use App\Interfaces\ICollectionService;
+use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
 use App\Model\ProxyResponseModel;
 use App\Response\ProxyExistsResponse;
 use App\Response\ProxyFailedResponse;
 use App\Response\ProxySuccessResponse;
+use App\Response\QueryFetchedSuccessResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,14 +34,15 @@ class ProxyController extends AbstractController
      * @SWG\Tag(name="proxy")
      *
      * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxies(ICollectionService $collectionService)
+    public function fetchProxies(ICollectionService $collectionService, IResponseService $responseService)
     {
         $data = $this->getDoctrine()->getRepository(Proxy::class)->findAll();
         $result = $collectionService->getCollection(ProxyFactory::class, $data);
 
-        return $this->json($result);
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -54,13 +57,16 @@ class ProxyController extends AbstractController
      * @SWG\Tag(name="proxy")
      *
      * @param $id
+     * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxyById($id)
+    public function fetchProxyById($id, ICollectionService $collectionService, IResponseService $responseService)
     {
         $data = ProxyFactory::create($this->getDoctrine()->getRepository(Proxy::class)->findBy(['id' => $id]))->getResponse();
+        $result = $collectionService->getCollection(ProxyFactory::class, $data);
 
-        return $this->json($data);
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**

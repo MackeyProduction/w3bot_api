@@ -17,9 +17,12 @@ use App\Entity\SoftwareName;
 use App\Entity\UserAgent;
 use App\Factory\UserAgentFactory;
 use App\Interfaces\ICollectionService;
+use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
 use App\Interfaces\IUserAgent;
 use App\Model\UserAgentResponseModel;
+use App\Repository\UserAgentRepository;
+use App\Response\QueryFetchedSuccessResponse;
 use App\Response\UserAgentExistsResponse;
 use App\Response\UserAgentFailedResponse;
 use App\Response\UserAgentSuccessResponse;
@@ -44,14 +47,15 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      *
      * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents(ICollectionService $collectionService)
+    public function fetchUserAgents(ICollectionService $collectionService, IResponseService $responseService)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findAll();
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
-        return $this->json($result);
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -66,14 +70,125 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      *
      * @param $id
+     * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentById($id)
+    public function fetchUserAgentById($id, ICollectionService $collectionService, IResponseService $responseService)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->find($id);
+        $result = $collectionService->getCollection(UserAgentFactory::class, [ $data ]);
 
         /** @var IUserAgent $data */
-        return $this->json(UserAgentResponseModel::create($data));
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+    }
+
+    /**
+     * Gets a user agent by operating system name.
+     *
+     * @Route("/api/agent/os/name/{name}", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a user agent by operating system name.",
+     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
+     * )
+     * @SWG\Parameter(
+     *     name="version",
+     *     in="query",
+     *     type="string",
+     *     description="The field used for os version."
+     * )
+     * @SWG\Tag(name="agent")
+     *
+     * @param $name
+     * @param Request $request
+     * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function fetchUserAgentByOperatingSystemName($name, Request $request, ICollectionService $collectionService, IResponseService $responseService)
+    {
+        $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemName($name);
+
+        if (!empty($request->query->get("version"))) {
+            $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemNameAndVersion($name, $request->query->get("version"));
+        }
+
+        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+
+        /** @var IUserAgent $data */
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+    }
+
+    /**
+     * Gets all user agents grouped by operating system name.
+     *
+     * @Route("/api/agent/os/names", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a list of user agents grouped by operating system name.",
+     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
+     * )
+     * @SWG\Tag(name="agent")
+     *
+     * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function fetchUserAgentByOperatingSystemNameGrouped(ICollectionService $collectionService, IResponseService $responseService)
+    {
+        $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemNameGrouped();
+        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+
+        /** @var IUserAgent $data */
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+    }
+
+    /**
+     * Gets a user agent by software name.
+     *
+     * @Route("/api/agent/software/{name}", methods={"GET"})
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a user agent by software name.",
+     *     @Model(type=UserAgentResponseModel::class, groups={"full"})
+     * )
+     * @SWG\Parameter(
+     *     name="version",
+     *     in="query",
+     *     type="string",
+     *     description="The field used for software version."
+     * )
+     * @SWG\Parameter(
+     *     name="leVersion",
+     *     in="query",
+     *     type="string",
+     *     description="The field used for layout engine version."
+     * )
+     * @SWG\Tag(name="agent")
+     *
+     * @param $name
+     * @param Request $request
+     * @param ICollectionService $collectionService
+     * @param IResponseService $responseService
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function fetchUserAgentBySoftwareName($name, Request $request, ICollectionService $collectionService, IResponseService $responseService)
+    {
+        $data = $this->getDoctrine()->getRepository(UserAgent::class)->findBySoftwareName($name);
+
+        if (!empty($request->query->get("version"))) {
+            $data = $this->getDoctrine()->getRepository(UserAgent::class)->findBySoftwareNameAndVersion($name, $request->query->get("version"));
+        }
+
+        if (!empty($request->query->get("leVersion"))) {
+            $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByLayoutEngineAndVersion($name, $request->query->get("leVersion"));
+        }
+
+        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+
+        /** @var IUserAgent $data */
+        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
