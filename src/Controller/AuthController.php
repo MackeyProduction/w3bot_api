@@ -17,6 +17,7 @@ use App\Response\RegisterSuccessResponse;
 use App\Response\TokenRefreshFailedResponse;
 use App\Response\UserLoginFailedResponse;
 use App\Response\UserLoginSuccessResponse;
+use App\Response\UserLogoutSuccessResponse;
 use App\Service\TokenService;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\HeaderAwareJWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
@@ -72,8 +73,8 @@ class AuthController extends Controller
     public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService, IResponseService $response)
     {
         // fetch credentials
-        $username = $request->headers->get("username");
-        $plainPassword = $request->headers->get("password");
+        $username = $request->request->get("username");
+        $plainPassword = $request->request->get("password");
 
         // fetch username
         $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $username]);
@@ -114,7 +115,7 @@ class AuthController extends Controller
      */
     public function logoutAction(Request $request, ITokenService $tokenService)
     {
-        return $tokenService->getTokenResponse($request, ['response' => 'User logged out successfully.']);
+        return $tokenService->getTokenResponse($request, UserLogoutSuccessResponse::class);
     }
 
     /**
@@ -292,5 +293,33 @@ class AuthController extends Controller
         }
 
         return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+    }
+
+    /**
+     * The user gets the current status of the user token.
+     *
+     * @Route("/api/status", methods={"POST"}, name="status")
+     * @SWG\Response(
+     *     response=200,
+     *     description="The user token is valid.",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="The authorization header isn't set or is invalid.",
+     * )
+     * @SWG\Response(
+     *     response=403,
+     *     description="The user token isn't valid anymore.",
+     * )
+     * @SWG\Tag(name="auth")
+     * @Security(name="Bearer")
+     *
+     * @param Request $request
+     * @param ITokenService $tokenService
+     * @return JsonResponse
+     */
+    public function statusAction(Request $request, ITokenService $tokenService)
+    {
+        return $tokenService->getTokenResponse($request);
     }
 }
