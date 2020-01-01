@@ -42,10 +42,10 @@ class UserService implements IUserService
     }
 
     /**
-     * @param IUser $user
+     * @param User $user
      * @return boolean
      */
-    public function verify(IUser $user)
+    public function verify(User $user)
     {
         /** @var $user User */
         if ($user != null) {
@@ -63,11 +63,11 @@ class UserService implements IUserService
     }
 
     /**
-     * @param IUser $user
+     * @param User $user
      * @param \Swift_Mailer $mailer
      * @return bool
      */
-    public function recoverPassword(IUser $user, \Swift_Mailer $mailer)
+    public function recoverPassword(User $user, \Swift_Mailer $mailer)
     {
         /** @var $user User */
         if ($user != null) {
@@ -96,10 +96,10 @@ class UserService implements IUserService
 
     /**
      * Maps the IUser interface on UserInterface.
-     * @param IUser $user
+     * @param User $user
      * @return UserAdapter
      */
-    public function mapUserCredentials(IUser $user)
+    public function mapUserCredentials(User $user)
     {
         return UserAdapter::create($user);
     }

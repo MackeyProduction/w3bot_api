@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Interfaces\ILayoutEngine;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\LayoutEngineRepository")
  */
-class LayoutEngine implements ILayoutEngine
+class LayoutEngine
 {
     /**
      * @ORM\Id()

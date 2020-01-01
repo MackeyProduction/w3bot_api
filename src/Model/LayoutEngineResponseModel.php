@@ -8,7 +8,7 @@
 
 namespace App\Model;
 
-use App\Interfaces\ILayoutEngine;
+use App\Entity\LayoutEngine;
 
 /**
  * Class LayoutEngineResponseModel
@@ -18,19 +18,19 @@ class LayoutEngineResponseModel
 {
     /**
      * LayoutEngineResponseModel constructor.
-     * @param ILayoutEngine $layoutEngine
+     * @param LayoutEngine $layoutEngine
      */
-    public function __construct(ILayoutEngine $layoutEngine)
+    public function __construct(LayoutEngine $layoutEngine)
     {
         $this->id = $layoutEngine->getId();
         $this->name = $layoutEngine->getName();
     }
 
     /**
-     * @param ILayoutEngine $layoutEngine
+     * @param LayoutEngine $layoutEngine
      * @return static
      */
-    public static function create(ILayoutEngine $layoutEngine)
+    public static function create(LayoutEngine $layoutEngine)
     {
         return new static($layoutEngine);
     }

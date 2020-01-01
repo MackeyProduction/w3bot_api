@@ -9,6 +9,7 @@
 namespace App\Interfaces;
 
 use App\Adapter\UserAdapter;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -18,21 +19,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 interface IUserService
 {
     /**
-     * @param IUser $user
+     * @param User $user
      * @return JsonResponse
      */
-    public function verify(IUser $user);
+    public function verify(User $user);
 
     /**
-     * @param IUser $user
+     * @param User $user
      * @return UserAdapter
      */
-    public function mapUserCredentials(IUser $user);
+    public function mapUserCredentials(User $user);
 
     /**
-     * @param IUser $user
+     * @param User $user
      * @param \Swift_Mailer $mailer
      * @return bool
      */
-    public function recoverPassword(IUser $user, \Swift_Mailer $mailer);
+    public function recoverPassword(User $user, \Swift_Mailer $mailer);
 }

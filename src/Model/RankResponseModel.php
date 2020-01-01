@@ -8,7 +8,7 @@
 
 namespace App\Model;
 
-use App\Interfaces\IRank;
+use App\Entity\Rank;
 
 /**
  * Class RankResponseModel
@@ -18,19 +18,19 @@ class RankResponseModel
 {
     /**
      * RankResponseModel constructor.
-     * @param IRank $rank
+     * @param Rank $rank
      */
-    public function __construct(IRank $rank)
+    public function __construct(Rank $rank)
     {
         $this->id = $rank->getId();
         $this->name = $rank->getName();
     }
 
     /**
-     * @param IRank $rank
+     * @param Rank $rank
      * @return static
      */
-    public static function create(IRank $rank)
+    public static function create(Rank $rank)
     {
         return new static($rank);
     }
