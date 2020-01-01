@@ -8,7 +8,7 @@
 
 namespace App\Model;
 
-use App\Interfaces\IOperatingSystemName;
+use App\Entity\OperatingSystemName;
 
 /**
  * Class OperatingSystemNameResponseModel
@@ -18,19 +18,19 @@ class OperatingSystemNameResponseModel
 {
     /**
      * OperatingSystemNameResponseModel constructor.
-     * @param IOperatingSystemName $operatingSystemName
+     * @param OperatingSystemName $operatingSystemName
      */
-    public function __construct(IOperatingSystemName $operatingSystemName)
+    public function __construct(OperatingSystemName $operatingSystemName)
     {
         $this->id = $operatingSystemName->getId();
         $this->name = $operatingSystemName->getName();
     }
 
     /**
-     * @param IOperatingSystemName $operatingSystemName
+     * @param OperatingSystemName $operatingSystemName
      * @return static
      */
-    public static function create(IOperatingSystemName $operatingSystemName)
+    public static function create(OperatingSystemName $operatingSystemName)
     {
         return new static($operatingSystemName);
     }

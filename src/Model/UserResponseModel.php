@@ -1,21 +1,17 @@
 <?php
-namespace App\Model;
-
-use App\Entity\User;
-use App\Interfaces\IRank;
-use App\Model\RankResponseModel;
-use App\Interfaces\IUser;
-use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Swagger\Annotations as SWG;
-
 /**
  * Created by PhpStorm.
  * User: Til Anheier
  * Date: 23.10.2018
  * Time: 21:31
  */
+
+namespace App\Model;
+
+use App\Entity\Rank;
+use App\Entity\User;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 /**
  * Class UserResponseModel
@@ -25,9 +21,9 @@ class UserResponseModel
 {
     /**
      * UserResponseModel constructor.
-     * @param IUser $user
+     * @param User $user
      */
-    public function __construct(IUser $user)
+    public function __construct(User $user)
     {
         $this->id = $user->getId();
         $this->username = $user->getUsername();
@@ -37,10 +33,10 @@ class UserResponseModel
     }
 
     /**
-     * @param IUser $user
+     * @param User $user
      * @return static
      */
-    public static function create(IUser $user)
+    public static function create(User $user)
     {
         return new static($user);
     }
@@ -70,7 +66,7 @@ class UserResponseModel
     public $registerDate;
 
     /**
-     * @var IRank
+     * @var Rank
      */
     public $rank;
 }

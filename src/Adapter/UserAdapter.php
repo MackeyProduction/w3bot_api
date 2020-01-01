@@ -8,7 +8,7 @@
 
 namespace App\Adapter;
 
-use App\Interfaces\IUser;
+use App\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -18,24 +18,24 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class UserAdapter implements UserInterface
 {
     /**
-     * @var IUser
+     * @var User
      */
     private $user;
 
     /**
      * UserAdapter constructor.
-     * @param IUser $user
+     * @param User $user
      */
-    public function __construct(IUser $user)
+    public function __construct(User $user)
     {
         $this->user = $user;
     }
 
     /**
-     * @param IUser $user
+     * @param User $user
      * @return static
      */
-    public static function create(IUser $user)
+    public static function create(User $user)
     {
         return new static($user);
     }

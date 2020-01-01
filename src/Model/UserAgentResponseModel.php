@@ -8,9 +8,9 @@
 
 namespace App\Model;
 
-use App\Interfaces\IOperatingSystem;
-use App\Interfaces\ISoftware;
-use App\Interfaces\IUserAgent;
+use App\Entity\OperatingSystem;
+use App\Entity\Software;
+use App\Entity\UserAgent;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 
@@ -22,9 +22,9 @@ class UserAgentResponseModel
 {
     /**
      * UserAgentResponseModel constructor.
-     * @param IUserAgent $userAgent
+     * @param UserAgent $userAgent
      */
-    public function __construct(IUserAgent $userAgent)
+    public function __construct(UserAgent $userAgent)
     {
         $this->id = $userAgent->getId();
         $this->operatingSystem = OperatingSystemResponseModel::create($userAgent->getOperatingSystem());
@@ -33,10 +33,10 @@ class UserAgentResponseModel
     }
 
     /**
-     * @param IUserAgent $userAgent
+     * @param UserAgent $userAgent
      * @return static
      */
-    public static function create(IUserAgent $userAgent)
+    public static function create(UserAgent $userAgent)
     {
         return new static($userAgent);
     }
@@ -48,12 +48,12 @@ class UserAgentResponseModel
     public $id;
 
     /**
-     * @var IOperatingSystem
+     * @var OperatingSystem
      */
     public $operatingSystem;
 
     /**
-     * @var ISoftware
+     * @var Software
      */
     public $software;
 

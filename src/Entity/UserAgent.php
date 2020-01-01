@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Interfaces\IUserAgent;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserAgentRepository")
  */
-class UserAgent implements IUserAgent
+class UserAgent
 {
     /**
      * @ORM\Id()

@@ -8,7 +8,7 @@
 
 namespace App\Model;
 
-use App\Interfaces\ISoftwareName;
+use App\Entity\SoftwareName;
 
 /**
  * Class SoftwareNameResponseModel
@@ -18,19 +18,19 @@ class SoftwareNameResponseModel
 {
     /**
      * SoftwareNameResponseModel constructor.
-     * @param ISoftwareName $softwareName
+     * @param SoftwareName $softwareName
      */
-    public function __construct(ISoftwareName $softwareName)
+    public function __construct(SoftwareName $softwareName)
     {
         $this->id = $softwareName->getId();
         $this->name = $softwareName->getName();
     }
 
     /**
-     * @param ISoftwareName $softwareName
+     * @param SoftwareName $softwareName
      * @return static
      */
-    public static function create(ISoftwareName $softwareName)
+    public static function create(SoftwareName $softwareName)
     {
         return new static($softwareName);
     }

@@ -8,7 +8,7 @@
 
 namespace App\Model;
 
-use App\Interfaces\IProxy;
+use App\Entity\Proxy;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 
@@ -20,9 +20,9 @@ class ProxyResponseModel
 {
     /**
      * ProxyResponseModel constructor.
-     * @param IProxy $proxy
+     * @param Proxy $proxy
      */
-    public function __construct(IProxy $proxy)
+    public function __construct(Proxy $proxy)
     {
         $this->id = $proxy->getId();
         $this->name = $proxy->getName();
@@ -33,10 +33,10 @@ class ProxyResponseModel
     }
 
     /**
-     * @param IProxy $proxy
+     * @param Proxy $proxy
      * @return static
      */
-    public static function create(IProxy $proxy)
+    public static function create(Proxy $proxy)
     {
         return new static($proxy);
     }

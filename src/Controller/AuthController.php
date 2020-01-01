@@ -6,7 +6,6 @@ use App\Entity\Rank;
 use App\Entity\User;
 use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
-use App\Interfaces\IUser;
 use App\Interfaces\IUserService;
 use App\Model\UserResponseModel;
 use App\Response\ForgotPasswordFailedResponse;
@@ -19,6 +18,7 @@ use App\Response\UserLoginFailedResponse;
 use App\Response\UserLoginSuccessResponse;
 use App\Response\UserLogoutSuccessResponse;
 use App\Service\TokenService;
+use JMS\Serializer\SerializerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\HeaderAwareJWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Response\JWTAuthenticationSuccessResponse;
@@ -49,18 +49,15 @@ class AuthController extends Controller
      *     description="The user login was failed.",
      * )
      * @SWG\Parameter(
-     *     name="username",
-     *     in="header",
+     *     name="body",
+     *     in="body",
      *     type="string",
-     *     description="The username from the user.",
-     *     required=true
-     * )
-     * @SWG\Parameter(
-     *     name="password",
-     *     in="header",
-     *     type="string",
-     *     description="The password from the user.",
-     *     required=true
+     *     description="The request body for user login. For a successful user login are username and password required.",
+     *     required=true,
+     *     @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=User::class, groups={"non_sensitive_data"}))
+     *     )
      * )
      * @SWG\Tag(name="auth")
      *
@@ -68,21 +65,22 @@ class AuthController extends Controller
      * @param JWTTokenManagerInterface $JWTTokenManager
      * @param IUserService $userService
      * @param IResponseService $response
+     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService, IResponseService $response)
+    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService, IResponseService $response, SerializerInterface $serializer)
     {
         // fetch credentials
-        $username = $request->request->get("username");
-        $plainPassword = $request->request->get("password");
+        /** @var User $user */
+        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
 
         // fetch username
-        $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $username]);
+        $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $user->getUsername()]);
 
         if ($result != null) {
-            $result->setPlainPassword($plainPassword);
+            $result->setPlainPassword($user->getPassword());
 
-            /** @var IUser $result */
+            /** @var User $result */
             $isOk = $userService->verify($result);
 
             if ($isOk) {
@@ -157,6 +155,7 @@ class AuthController extends Controller
      * @param IResponseService $responseService
      * @param ValidatorInterface $validator
      * @return JsonResponse
+     * @throws \Exception
      */
     public function registerAction(Request $request, IResponseService $responseService, ValidatorInterface $validator)
     {
@@ -281,7 +280,7 @@ class AuthController extends Controller
                 return $responseService->getJsonResponse(QueryNotExistResponse::class);
             }
 
-            /** @var IUser $user*/
+            /** @var User $user*/
             $response = $userService->recoverPassword($user, $mailer);
 
             // email send successfully?

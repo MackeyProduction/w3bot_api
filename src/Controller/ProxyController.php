@@ -63,7 +63,7 @@ class ProxyController extends AbstractController
      */
     public function fetchProxyById($id, ICollectionService $collectionService, IResponseService $responseService)
     {
-        $data = ProxyFactory::create($this->getDoctrine()->getRepository(Proxy::class)->findBy(['id' => $id]))->getResponse();
+        $data = $this->getDoctrine()->getRepository(Proxy::class)->findBy(['id' => $id]);
         $result = $collectionService->getCollection(ProxyFactory::class, $data);
 
         return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);

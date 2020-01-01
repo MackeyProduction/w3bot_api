@@ -8,8 +8,8 @@
 
 namespace App\Model;
 
-use App\Interfaces\IOperatingSystem;
-use App\Interfaces\IOperatingSystemName;
+use App\Entity\OperatingSystem;
+use App\Entity\OperatingSystemName;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
 
@@ -21,9 +21,9 @@ class OperatingSystemResponseModel
 {
     /**
      * OperatingSystemResponseModel constructor.
-     * @param IOperatingSystem $operatingSystem
+     * @param OperatingSystem $operatingSystem
      */
-    public function __construct(IOperatingSystem $operatingSystem)
+    public function __construct(OperatingSystem $operatingSystem)
     {
         $this->id = $operatingSystem->getId();
         $this->operatingSystemName = OperatingSystemNameResponseModel::create($operatingSystem->getOperatingSystemName());
@@ -31,10 +31,10 @@ class OperatingSystemResponseModel
     }
 
     /**
-     * @param IOperatingSystem $operatingSystem
+     * @param OperatingSystem $operatingSystem
      * @return static
      */
-    public static function create(IOperatingSystem $operatingSystem)
+    public static function create(OperatingSystem $operatingSystem)
     {
         return new static($operatingSystem);
     }
@@ -46,7 +46,7 @@ class OperatingSystemResponseModel
     public $id;
 
     /**
-     * @var IOperatingSystemName
+     * @var OperatingSystemName
      */
     public $operatingSystemName;
 

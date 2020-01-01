@@ -79,7 +79,7 @@ class UserAgentController extends Controller
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->find($id);
         $result = $collectionService->getCollection(UserAgentFactory::class, [ $data ]);
 
-        /** @var IUserAgent $data */
+        /** @var UserAgent $data */
         return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
@@ -116,7 +116,7 @@ class UserAgentController extends Controller
 
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
-        /** @var IUserAgent $data */
+        /** @var UserAgent $data */
         return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
@@ -140,7 +140,7 @@ class UserAgentController extends Controller
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemNameGrouped();
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
-        /** @var IUserAgent $data */
+        /** @var UserAgent $data */
         return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
@@ -187,7 +187,7 @@ class UserAgentController extends Controller
 
         $result = $collectionService->getCollection(UserAgentFactory::class, $data);
 
-        /** @var IUserAgent $data */
+        /** @var UserAgent $data */
         return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 

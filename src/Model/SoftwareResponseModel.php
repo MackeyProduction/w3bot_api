@@ -8,10 +8,9 @@
 
 namespace App\Model;
 
+use App\Entity\LayoutEngine;
+use App\Entity\Software;
 use App\Entity\SoftwareName;
-use App\Interfaces\ILayoutEngine;
-use App\Interfaces\ISoftware;
-use App\Interfaces\ISoftwareName;
 
 /**
  * Class SoftwareResponseModel
@@ -21,9 +20,9 @@ class SoftwareResponseModel
 {
     /**
      * SoftwareResponseModel constructor.
-     * @param ISoftware $software
+     * @param Software $software
      */
-    public function __construct(ISoftware $software)
+    public function __construct(Software $software)
     {
         $this->id = $software->getId();
         $this->softwareName = SoftwareNameResponseModel::create($software->getSoftwareName());
@@ -33,10 +32,10 @@ class SoftwareResponseModel
     }
 
     /**
-     * @param ISoftware $software
+     * @param Software $software
      * @return static
      */
-    public static function create(ISoftware $software)
+    public static function create(Software $software)
     {
         return new static($software);
     }
@@ -48,7 +47,7 @@ class SoftwareResponseModel
     public $id;
 
     /**
-     * @var ISoftwareName
+     * @var SoftwareName
      */
     public $softwareName;
 
@@ -59,7 +58,7 @@ class SoftwareResponseModel
     public $version;
 
     /**
-     * @var ILayoutEngine
+     * @var LayoutEngine
      */
     public $layoutEngine;
 
