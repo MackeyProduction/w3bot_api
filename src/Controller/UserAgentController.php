@@ -19,7 +19,6 @@ use App\Factory\UserAgentFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
-use App\Interfaces\IUserAgent;
 use App\Model\UserAgentResponseModel;
 use App\Repository\UserAgentRepository;
 use App\Response\QueryFetchedSuccessResponse;
@@ -36,6 +35,31 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserAgentController extends Controller
 {
     /**
+     * @var ITokenService $tokenService
+     */
+    private $tokenService;
+
+    /**
+     * @var ICollectionService $collectionService
+     */
+    private $collectionService;
+
+    /**
+     * @var IResponseService $responseService
+     */
+    private $responseService;
+
+    public function __construct(
+        ITokenService $tokenService,
+        ICollectionService $collectionService,
+        IResponseService $responseService)
+    {
+        $this->tokenService = $tokenService;
+        $this->collectionService = $collectionService;
+        $this->responseService = $responseService;
+    }
+
+    /**
      * Gets a list of user agents from the user.
      *
      * @Route("/api/agent", methods={"GET"})
@@ -46,16 +70,14 @@ class UserAgentController extends Controller
      * )
      * @SWG\Tag(name="agent")
      *
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents(ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchUserAgents()
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findAll();
-        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+        $result = $this->collectionService->getCollection(UserAgentFactory::class, $data);
 
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -70,17 +92,15 @@ class UserAgentController extends Controller
      * @SWG\Tag(name="agent")
      *
      * @param $id
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentById($id, ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchUserAgentById($id)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->find($id);
-        $result = $collectionService->getCollection(UserAgentFactory::class, [ $data ]);
+        $result = $this->collectionService->getCollection(UserAgentFactory::class, [ $data ]);
 
         /** @var UserAgent $data */
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -102,11 +122,9 @@ class UserAgentController extends Controller
      *
      * @param $name
      * @param Request $request
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentByOperatingSystemName($name, Request $request, ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchUserAgentByOperatingSystemName($name, Request $request)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemName($name);
 
@@ -114,10 +132,10 @@ class UserAgentController extends Controller
             $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemNameAndVersion($name, $request->query->get("version"));
         }
 
-        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+        $result = $this->collectionService->getCollection(UserAgentFactory::class, $data);
 
         /** @var UserAgent $data */
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -131,17 +149,15 @@ class UserAgentController extends Controller
      * )
      * @SWG\Tag(name="agent")
      *
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentByOperatingSystemNameGrouped(ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchUserAgentByOperatingSystemNameGrouped()
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByOperatingSystemNameGrouped();
-        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+        $result = $this->collectionService->getCollection(UserAgentFactory::class, $data);
 
         /** @var UserAgent $data */
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -169,11 +185,9 @@ class UserAgentController extends Controller
      *
      * @param $name
      * @param Request $request
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgentBySoftwareName($name, Request $request, ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchUserAgentBySoftwareName($name, Request $request)
     {
         $data = $this->getDoctrine()->getRepository(UserAgent::class)->findBySoftwareName($name);
 
@@ -185,10 +199,10 @@ class UserAgentController extends Controller
             $data = $this->getDoctrine()->getRepository(UserAgent::class)->findByLayoutEngineAndVersion($name, $request->query->get("leVersion"));
         }
 
-        $result = $collectionService->getCollection(UserAgentFactory::class, $data);
+        $result = $this->collectionService->getCollection(UserAgentFactory::class, $data);
 
         /** @var UserAgent $data */
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -204,12 +218,11 @@ class UserAgentController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postUserAgent(Request $request, ITokenService $tokenService)
+    public function postUserAgent(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             $entityManager = $this->getDoctrine()->getManager();
 
@@ -304,15 +317,15 @@ class UserAgentController extends Controller
                     // push to database
                     $entityManager->flush();
 
-                    return $tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
+                    return $this->tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
                 } else {
-                    return $tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
+                    return $this->tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
                 }
             } else {
-                return $tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
+                return $this->tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
             }
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 }

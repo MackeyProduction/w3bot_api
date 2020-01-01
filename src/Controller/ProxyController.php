@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Proxy;
 use App\Factory\ProxyFactory;
-use App\Factory\UProxyFactory;
 use App\Interfaces\ICollectionService;
 use App\Interfaces\IResponseService;
 use App\Interfaces\ITokenService;
@@ -23,6 +22,31 @@ use Swagger\Annotations as SWG;
 class ProxyController extends AbstractController
 {
     /**
+     * @var ITokenService $tokenService
+     */
+    private $tokenService;
+
+    /**
+     * @var ICollectionService $collectionService
+     */
+    private $collectionService;
+
+    /**
+     * @var IResponseService $responseService
+     */
+    private $responseService;
+
+    public function __construct(
+        ITokenService $tokenService,
+        ICollectionService $collectionService,
+        IResponseService $responseService)
+    {
+        $this->tokenService = $tokenService;
+        $this->collectionService = $collectionService;
+        $this->responseService = $responseService;
+    }
+
+    /**
      * Gets a list of proxies filtered by user.
      *
      * @Route("/api/proxy", methods={"GET"})
@@ -33,16 +57,14 @@ class ProxyController extends AbstractController
      * )
      * @SWG\Tag(name="proxy")
      *
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxies(ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchProxies()
     {
         $data = $this->getDoctrine()->getRepository(Proxy::class)->findAll();
-        $result = $collectionService->getCollection(ProxyFactory::class, $data);
+        $result = $this->collectionService->getCollection(ProxyFactory::class, $data);
 
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -57,16 +79,14 @@ class ProxyController extends AbstractController
      * @SWG\Tag(name="proxy")
      *
      * @param $id
-     * @param ICollectionService $collectionService
-     * @param IResponseService $responseService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxyById($id, ICollectionService $collectionService, IResponseService $responseService)
+    public function fetchProxyById($id)
     {
         $data = $this->getDoctrine()->getRepository(Proxy::class)->findBy(['id' => $id]);
-        $result = $collectionService->getCollection(ProxyFactory::class, $data);
+        $result = $this->collectionService->getCollection(ProxyFactory::class, $data);
 
-        return $responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
+        return $this->responseService->getJsonResponse(QueryFetchedSuccessResponse::class, [ 'data' => $result ]);
     }
 
     /**
@@ -82,12 +102,11 @@ class ProxyController extends AbstractController
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postProxy(Request $request, ITokenService $tokenService)
+    public function postProxy(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             $entityManager = $this->getDoctrine()->getManager();
 
@@ -111,15 +130,15 @@ class ProxyController extends AbstractController
                     $entityManager->persist($proxyEntity);
                     $entityManager->flush();
 
-                    return $tokenService->getTokenResponse($request, ProxySuccessResponse::class);
+                    return $this->tokenService->getTokenResponse($request, ProxySuccessResponse::class);
                 } else {
-                    return $tokenService->getTokenResponse($request, ProxyExistsResponse::class);
+                    return $this->tokenService->getTokenResponse($request, ProxyExistsResponse::class);
                 }
             } else {
-                return $tokenService->getTokenResponse($request, ProxyFailedResponse::class);
+                return $this->tokenService->getTokenResponse($request, ProxyFailedResponse::class);
             }
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 }

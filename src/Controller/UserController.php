@@ -31,6 +31,22 @@ use Swagger\Annotations as SWG;
 class UserController extends Controller
 {
     /**
+     * @var ITokenService $tokenService
+     */
+    private $tokenService;
+
+    /**
+     * @var ICollectionService $collectionService
+     */
+    private $collectionService;
+
+    public function __construct(ITokenService $tokenService, ICollectionService $collectionService)
+    {
+        $this->tokenService = $tokenService;
+        $this->collectionService = $collectionService;
+    }
+
+    /**
      * @Route("/api/user", methods={"GET"}, name="user")
      * @SWG\Response(
      *     response=200,
@@ -47,13 +63,11 @@ class UserController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ICollectionService $collectionService
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUser(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
+    public function fetchUser(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             $data = $this->getDoctrine()->getRepository(User::class)->findAll();
 
@@ -61,12 +75,12 @@ class UserController extends Controller
                 $data = $this->getDoctrine()->getRepository(User::class)->findBy([ 'username' => $request->query->get("name") ]);
             }
 
-            $result = $collectionService->getCollection(UserFactory::class, $data);
+            $result = $this->collectionService->getCollection(UserFactory::class, $data);
 
-            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
+            return $this->tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 
     /**
@@ -82,22 +96,20 @@ class UserController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ICollectionService $collectionService
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchUserAgents(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
+    public function fetchUserAgents(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             /** @var User $data */
-            $data = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $tokenService->getPayload($request)['username']]);
-            $result = $collectionService->getCollection(UserAgentFactory::class, $data->getUua()->toArray());
+            $data = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $this->tokenService->getPayload($request)['username']]);
+            $result = $this->collectionService->getCollection(UserAgentFactory::class, $data->getUua()->toArray());
 
-            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
+            return $this->tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 
     /**
@@ -113,12 +125,11 @@ class UserController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postUserAgent(Request $request, ITokenService $tokenService)
+    public function postUserAgent(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             $entityManager = $this->getDoctrine()->getManager();
 
@@ -139,19 +150,19 @@ class UserController extends Controller
                         $entityManager->persist($userResult);
                         $entityManager->flush();
 
-                        return $tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
+                        return $this->tokenService->getTokenResponse($request, UserAgentSuccessResponse::class);
                     } else {
-                        return $tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
+                        return $this->tokenService->getTokenResponse($request, UserAgentExistsResponse::class);
                     }
                 } else {
-                    return $tokenService->getTokenResponse($request, QueryNotExistResponse::class);
+                    return $this->tokenService->getTokenResponse($request, QueryNotExistResponse::class);
                 }
             } else {
-                return $tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
+                return $this->tokenService->getTokenResponse($request, UserAgentFailedResponse::class);
             }
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 
     /**
@@ -167,22 +178,20 @@ class UserController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ICollectionService $collectionService
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function fetchProxies(Request $request, ICollectionService $collectionService, ITokenService $tokenService)
+    public function fetchProxies(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             /** @var User $data */
-            $data = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $tokenService->getPayload($request)['username']]);
-            $result = $collectionService->getCollection(ProxyFactory::class, $data->getUp()->toArray());
+            $data = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $this->tokenService->getPayload($request)['username']]);
+            $result = $this->collectionService->getCollection(ProxyFactory::class, $data->getUp()->toArray());
 
-            return $tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
+            return $this->tokenService->getTokenResponse($request, QueryFetchedSuccessResponse::class, $result);
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 
     /**
@@ -198,12 +207,11 @@ class UserController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ITokenService $tokenService
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function postProxy(Request $request, ITokenService $tokenService)
+    public function postProxy(Request $request)
     {
-        if ($tokenService->getTokenResponse($request)->isSuccessful())
+        if ($this->tokenService->getTokenResponse($request)->isSuccessful())
         {
             $entityManager = $this->getDoctrine()->getManager();
 
@@ -224,16 +232,16 @@ class UserController extends Controller
                         $entityManager->persist($userResult);
                         $entityManager->flush();
 
-                        return $tokenService->getTokenResponse($request, ProxySuccessResponse::class);
+                        return $this->tokenService->getTokenResponse($request, ProxySuccessResponse::class);
                     } else {
-                        return $tokenService->getTokenResponse($request, ProxyExistsResponse::class);
+                        return $this->tokenService->getTokenResponse($request, ProxyExistsResponse::class);
                     }
                 }
             } else {
-                return $tokenService->getTokenResponse($request, ProxyFailedResponse::class);
+                return $this->tokenService->getTokenResponse($request, ProxyFailedResponse::class);
             }
         }
 
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 }

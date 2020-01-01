@@ -32,10 +32,56 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface as ValidationService;
 
 class AuthController extends Controller
 {
+    /**
+     * @var JWTTokenManagerInterface $JWTTokenManager
+     */
+    private $JWTTokenManager;
+
+    /**
+     * @var ITokenService $tokenService
+     */
+    private $tokenService;
+
+    /**
+     * @var IUserService $userService;
+     */
+    private $userService;
+
+    /**
+     * @var IResponseService $responseService
+     */
+    private $responseService;
+
+    /**
+     * @var SerializerInterface $serializer
+     */
+    private $serializer;
+
+    /**
+     * @var ValidationService $validationService
+     */
+    private $validationService;
+
+    public function __construct(
+        JWTTokenManagerInterface $JWTTokenManager,
+        ITokenService $tokenService,
+        IUserService $userService,
+        IResponseService $responseService,
+        SerializerInterface $serializer,
+        ValidationService $validationService)
+    {
+        $this->JWTTokenManager = $JWTTokenManager;
+        $this->tokenService = $tokenService;
+        $this->userService = $userService;
+        $this->responseService = $responseService;
+        $this->serializer = $serializer;
+        $this->validationService = $validationService;
+    }
+
     /**
      * The user will be logged in.
      *
@@ -62,17 +108,13 @@ class AuthController extends Controller
      * @SWG\Tag(name="auth")
      *
      * @param Request $request
-     * @param JWTTokenManagerInterface $JWTTokenManager
-     * @param IUserService $userService
-     * @param IResponseService $response
-     * @param SerializerInterface $serializer
      * @return JsonResponse
      */
-    public function loginAction(Request $request, JWTTokenManagerInterface $JWTTokenManager, IUserService $userService, IResponseService $response, SerializerInterface $serializer)
+    public function loginAction(Request $request)
     {
         // fetch credentials
         /** @var User $user */
-        $user = $serializer->deserialize($request->getContent(), User::class, 'json');
+        $user = $this->serializer->deserialize($request->getContent(), User::class, 'json');
 
         // fetch username
         $result = $this->getDoctrine()->getRepository(User::class)->findOneBy(['username' => $user->getUsername()]);
@@ -81,19 +123,19 @@ class AuthController extends Controller
             $result->setPlainPassword($user->getPassword());
 
             /** @var User $result */
-            $isOk = $userService->verify($result);
+            $isOk = $this->userService->verify($result);
 
             if ($isOk) {
-                $mappedUser = $userService->mapUserCredentials($result);
+                $mappedUser = $this->userService->mapUserCredentials($result);
 
                 // generate token
-                $token = $JWTTokenManager->create($mappedUser);
+                $token = $this->JWTTokenManager->create($mappedUser);
 
-                return $response->getJsonResponse(UserLoginSuccessResponse::class, ['token' => $token]);
+                return $this->responseService->getJsonResponse(UserLoginSuccessResponse::class, ['token' => $token]);
             }
         }
 
-        return $response->getJsonResponse(UserLoginFailedResponse::class);
+        return $this->responseService->getJsonResponse(UserLoginFailedResponse::class);
     }
 
     /**
@@ -108,12 +150,11 @@ class AuthController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ITokenService $tokenService
      * @return JsonResponse
      */
-    public function logoutAction(Request $request, ITokenService $tokenService)
+    public function logoutAction(Request $request)
     {
-        return $tokenService->getTokenResponse($request, UserLogoutSuccessResponse::class);
+        return $this->tokenService->getTokenResponse($request, UserLogoutSuccessResponse::class);
     }
 
     /**
@@ -152,12 +193,10 @@ class AuthController extends Controller
      * @SWG\Tag(name="auth")
      *
      * @param Request $request
-     * @param IResponseService $responseService
-     * @param ValidatorInterface $validator
      * @return JsonResponse
      * @throws \Exception
      */
-    public function registerAction(Request $request, IResponseService $responseService, ValidatorInterface $validator)
+    public function registerAction(Request $request)
     {
         $entityManager = $this->getDoctrine()->getManager();
 
@@ -166,7 +205,7 @@ class AuthController extends Controller
         $email = $request->request->get("email");
 
         if (empty($username) || empty($plainPassword) || empty($email)) {
-            return $responseService->getJsonResponse(RegisterFailedResponse::class);
+            return $this->responseService->getJsonResponse(RegisterFailedResponse::class);
         }
 
         $user = new User();
@@ -181,24 +220,24 @@ class AuthController extends Controller
 
         // check if query exists
         if ($rank == null) {
-            return $responseService->getJsonResponse(QueryNotExistResponse::class);
+            return $this->responseService->getJsonResponse(QueryNotExistResponse::class);
         }
 
         $user->setRank($rank);
 
         // catch errors
-        $errors = $validator->validate($user);
+        $errors = $this->validationService->validate($user);
 
         if (count($errors) > 0) {
             $errorString = (string)$errors;
 
-            return $responseService->getJsonResponse(RegisterFailedResponse::class, [ 'error' => $errorString ]);
+            return $this->responseService->getJsonResponse(RegisterFailedResponse::class, [ 'error' => $errorString ]);
         }
 
         $entityManager->persist($user);
         $entityManager->flush();
 
-        return $responseService->getJsonResponse(RegisterSuccessResponse::class);
+        return $this->responseService->getJsonResponse(RegisterSuccessResponse::class);
     }
 
     /**
@@ -223,20 +262,17 @@ class AuthController extends Controller
      * @SWG\Tag(name="auth")
      *
      * @param Request $request
-     * @param IResponseService $responseService
-     * @param IUserService $userService
-     * @param ITokenService $tokenService
      * @return JsonResponse
      */
-    public function refreshTokenAction(Request $request, IResponseService $responseService, IUserService $userService, ITokenService $tokenService)
+    public function refreshTokenAction(Request $request)
     {
         $expiredToken = $request->request->get("expiredToken");
 
         if (empty($expiredToken)) {
-            return $responseService->getJsonResponse(TokenRefreshFailedResponse::class);
+            return $this->responseService->getJsonResponse(TokenRefreshFailedResponse::class);
         }
 
-        $response = $tokenService->refreshToken($expiredToken, $userService);
+        $response = $this->tokenService->refreshToken($expiredToken, $this->userService);
 
         return $response;
     }
@@ -263,12 +299,10 @@ class AuthController extends Controller
      * @SWG\Tag(name="auth")
      *
      * @param Request $request
-     * @param IResponseService $responseService
-     * @param IUserService $userService
      * @param \Swift_Mailer $mailer
      * @return JsonResponse
      */
-    public function forgotPasswordAction(Request $request, IResponseService $responseService, IUserService $userService, \Swift_Mailer $mailer)
+    public function forgotPasswordAction(Request $request, \Swift_Mailer $mailer)
     {
         $username = $request->request->get("username");
 
@@ -277,21 +311,21 @@ class AuthController extends Controller
 
             // check if user exists
             if ($user == null) {
-                return $responseService->getJsonResponse(QueryNotExistResponse::class);
+                return $this->responseService->getJsonResponse(QueryNotExistResponse::class);
             }
 
             /** @var User $user*/
-            $response = $userService->recoverPassword($user, $mailer);
+            $response = $this->userService->recoverPassword($user, $mailer);
 
             // email send successfully?
             if (!$response) {
-                return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+                return $this->responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
             }
 
-            return $responseService->getJsonResponse(ForgotPasswordSuccessResponse::class);
+            return $this->responseService->getJsonResponse(ForgotPasswordSuccessResponse::class);
         }
 
-        return $responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
+        return $this->responseService->getJsonResponse(ForgotPasswordFailedResponse::class);
     }
 
     /**
@@ -314,11 +348,10 @@ class AuthController extends Controller
      * @Security(name="Bearer")
      *
      * @param Request $request
-     * @param ITokenService $tokenService
      * @return JsonResponse
      */
-    public function statusAction(Request $request, ITokenService $tokenService)
+    public function statusAction(Request $request)
     {
-        return $tokenService->getTokenResponse($request);
+        return $this->tokenService->getTokenResponse($request);
     }
 }
